@@ -324,6 +324,24 @@ ai.RegisterApiProvider(ai.ApiProvider{
 })
 ```
 
+## Examples
+
+| Example | Description |
+|---------|-------------|
+| [01-minimal-agent](examples/01-minimal-agent/) | Basic agent with mock stream |
+| [02-tool-calling](examples/02-tool-calling/) | Define tools, handle tool calls |
+| [03-streaming-events](examples/03-streaming-events/) | Real-time stream event handling |
+| [04-session-persistence](examples/04-session-persistence/) | Multi-turn with harness + session |
+| [05-custom-provider](examples/05-custom-provider/) | Register a custom API provider |
+| [06-steering-followup](examples/06-steering-followup/) | Steering and follow-up queues |
+
+## Contributing
+
+```bash
+go test ./...       # run all tests
+go vet ./...        # zero warnings
+```
+
 ## License
 
-Private — © chinudotdev
+MIT
