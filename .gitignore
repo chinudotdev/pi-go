@@ -1,0 +1,51 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Build output
+/bin/
+/dist/
+
+# Test
+*.test
+*.out
+*.prof
+coverage.txt
+coverage.html
+
+# Go workspace
+go.work.sum
+
+# Dependency directories
+/vendor/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Session / log files
+*.jsonl
+!agent/harness/session/testdata/*.jsonl
+logs/
+
+# TypeScript source (not part of Go build)
+pi/
+
+# Planning docs
+PHASES.md
+TEST_PLAN.md
