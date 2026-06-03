@@ -116,6 +116,8 @@ func runLoop(
 				}
 				failMsg := ai.MakeErrorAssistantMessage(config.Model, errStr)
 				failAsMsg := ai.AssistantMessageToMessage(failMsg)
+				_ = emit(Event{Type: EventMessageStart, Msg: failAsMsg})
+				_ = emit(Event{Type: EventMessageEnd, Msg: failAsMsg})
 				_ = emit(Event{Type: EventTurnEnd, Message: &failMsg})
 				_ = emit(Event{Type: EventAgentEnd, Messages: append(newMessages, failAsMsg)})
 				return nil
@@ -123,6 +125,8 @@ func runLoop(
 			newMessages = append(newMessages, ai.AssistantMessageToMessage(*msg))
 
 			if msg.StopReason == ai.StopReasonError || msg.StopReason == ai.StopReasonAborted {
+				_ = emit(Event{Type: EventMessageStart, Msg: ai.AssistantMessageToMessage(*msg)})
+				_ = emit(Event{Type: EventMessageEnd, Msg: ai.AssistantMessageToMessage(*msg)})
 				_ = emit(Event{Type: EventTurnEnd, Message: msg})
 				_ = emit(Event{Type: EventAgentEnd, Messages: newMessages})
 				return nil

@@ -631,3 +631,95 @@ func TestCycleThinkingLevel_NoModel(t *testing.T) {
 
 // Verify session.NewSession is reachable
 var _ = session.NewSession
+
+// ============================================================================
+// Bug regression tests
+// ============================================================================
+
+// TestCreateSession_PromptWithFauxProvider verifies that CreateSession + Prompt
+// works end-to-end with a registered API provider (faux). This catches the bug
+// where the SDK package failed to register built-in API providers, causing
+// ai.StreamSimple to return "no API provider registered for api: faux".
+func TestCreateSession_PromptWithFauxProvider(t *testing.T) {
+	dir := tempDir(t)
+	sessDir := filepath.Join(dir, "sessions")
+	os.MkdirAll(sessDir, 0755)
+
+	// Write a models.json that registers the faux provider
+	// Note: baseUrl is required by the model registry even though the faux provider
+	// doesn't use it. Without it, the registry skips the model entirely.
+	modelsJSON := `{
+		"providers": {
+			"faux": {
+				"api": "faux",
+				"apiKey": "test-faux-key",
+				"baseUrl": "https://faux.example.com/v1",
+				"models": [
+					{
+						"id": "faux-1",
+						"name": "Faux Model",
+						"input": ["text"],
+						"contextWindow": 4096,
+						"maxTokens": 1024
+					}
+				]
+			}
+		}
+	}`
+	modelsPath := filepath.Join(dir, "models.json")
+	writeFile(t, modelsPath, modelsJSON)
+
+	backend := auth.NewMemoryBackend()
+	authStorage := auth.NewStorage(backend)
+	authStorage.SetRuntimeOverride("faux", "test-faux-key")
+
+	modelReg := models.NewRegistry(authStorage, modelsPath)
+
+	model := modelReg.Find("faux", "faux-1")
+	if model == nil {
+		t.Fatal("faux/faux-1 model not found in registry")
+	}
+
+	settingsMgr := settings.InMemory()
+	ctx := context.Background()
+
+	result, err := CreateSession(ctx, CreateSessionOptions{
+		CWD:           dir,
+		AgentDir:      dir,
+		AuthStorage:   authStorage,
+		SettingsMgr:   settingsMgr,
+		ModelRegistry: modelReg,
+		Model:         model,
+		SessionDir:    sessDir,
+		NoTools:       true,
+	})
+	if err != nil {
+		t.Fatalf("CreateSession failed: %v", err)
+	}
+	defer result.Session.Dispose(ctx)
+
+	msg, err := result.Session.Prompt(ctx, "Hello, faux model!", nil)
+	if err != nil {
+		t.Fatalf("Prompt failed: %v", err)
+	}
+	if msg == nil {
+		t.Fatal("Prompt returned nil message")
+	}
+	if msg.Role != "assistant" {
+		t.Errorf("message role = %q, want assistant", msg.Role)
+	}
+	if msg.StopReason != ai.StopReasonStop {
+		t.Errorf("stopReason = %q, want stop", msg.StopReason)
+	}
+
+	var text string
+	for _, block := range msg.AssistantContent {
+		if block.Type == "text" {
+			text += block.Text
+		}
+	}
+	if text == "" {
+		t.Error("expected non-empty text response from faux provider")
+	}
+	t.Logf("Faux response: %s", text)
+}

@@ -2045,6 +2045,140 @@ func countEvent(types []string, want string) int {
 	return count
 }
 
+// ============================================================================
+// Bug regression tests
+// ============================================================================
+
+// TestRunAgentLoop_StreamErrorEmitsMessageEnd verifies that when the StreamFn
+// returns an error, RunAgentLoop still emits EventMessageStart + EventMessageEnd
+// for the failure assistant message. Without this, the harness's executeTurn
+// cannot capture lastAssistant and returns AgentHarnessError(invalid_state).
+func TestRunAgentLoop_StreamErrorEmitsMessageEnd(t *testing.T) {
+	streamErr := fmt.Errorf("simulated provider error")
+	errorStreamFn := func(ctx context.Context, model *ai.Model, convCtx *ai.Context, opts *ai.SimpleStreamOptions) (*ai.EventStream, error) {
+		return nil, streamErr
+	}
+
+	var events []Event
+	emit := func(e Event) error {
+		events = append(events, e)
+		return nil
+	}
+
+	agentCtx := &AgentContext{
+		SystemPrompt: "You are helpful.",
+	}
+	config := &LoopConfig{
+		Model:        testModel(),
+		Reasoning:    ThinkingOff,
+		ConvertToLlm: DefaultConvertToLlm,
+	}
+
+	err := RunAgentLoop(context.Background(), []AgentMessage{ai.NewUserMessage("hello")}, agentCtx, config, emit, errorStreamFn)
+	if err != nil {
+		t.Fatalf("RunAgentLoop returned error: %v", err)
+	}
+
+	types := eventTypes(events)
+	t.Logf("Events: %v", types)
+
+	// Must have the full lifecycle including message events for the failure
+	assertHasEvent(t, types, EventAgentStart)
+	assertHasEvent(t, types, EventTurnStart)
+	assertHasEvent(t, types, EventMessageStart)
+	assertHasEvent(t, types, EventMessageEnd)
+	assertHasEvent(t, types, EventTurnEnd)
+	assertHasEvent(t, types, EventAgentEnd)
+
+	// The EventMessageEnd must carry an assistant message with error details
+	var assistantMsgEnd *Event
+	for i := range events {
+		if events[i].Type == EventMessageEnd && events[i].Msg.Role == "assistant" {
+			ev := events[i]
+			assistantMsgEnd = &ev
+			break
+		}
+	}
+	if assistantMsgEnd == nil {
+		t.Fatal("no EventMessageEnd with role=assistant found")
+	}
+	if assistantMsgEnd.Msg.StopReason != ai.StopReasonError {
+		t.Errorf("EventMessageEnd stopReason = %q, want error", assistantMsgEnd.Msg.StopReason)
+	}
+	if assistantMsgEnd.Msg.ErrorMessage == nil || !strings.Contains(*assistantMsgEnd.Msg.ErrorMessage, streamErr.Error()) {
+		var errMsg string
+		if assistantMsgEnd.Msg.ErrorMessage != nil {
+			errMsg = *assistantMsgEnd.Msg.ErrorMessage
+		}
+		t.Errorf("EventMessageEnd errorMessage = %q, want containing %q", errMsg, streamErr.Error())
+	}
+}
+
+// TestRunAgentLoop_ErrorStopReasonEmitsMessageEnd verifies that when the stream
+// returns a message with StopReasonError or StopReasonAborted, RunAgentLoop
+// still emits EventMessageStart + EventMessageEnd before EventTurnEnd/EventAgentEnd.
+func TestRunAgentLoop_ErrorStopReasonEmitsMessageEnd(t *testing.T) {
+	errorStopStreamFn := func(ctx context.Context, model *ai.Model, convCtx *ai.Context, opts *ai.SimpleStreamOptions) (*ai.EventStream, error) {
+		stream := ai.NewEventStream(ctx)
+		go func() {
+			output := ai.NewAssistantOutput(model.API, model.Provider, model.ID)
+			stream.Push(ai.AssistantMessageEvent{Type: "start", Partial: &output})
+			output.StopReason = ai.StopReasonError
+			errMsg := "provider returned an error"
+			output.ErrorMessage = &errMsg
+			output.Timestamp = time.Now().UnixMilli()
+			stream.Push(ai.AssistantMessageEvent{Type: "done", Reason: ai.StopReasonError, Message: &output})
+			stream.End(output)
+		}()
+		return stream, nil
+	}
+
+	var events []Event
+	emit := func(e Event) error {
+		events = append(events, e)
+		return nil
+	}
+
+	agentCtx := &AgentContext{
+		SystemPrompt: "You are helpful.",
+	}
+	config := &LoopConfig{
+		Model:        testModel(),
+		Reasoning:    ThinkingOff,
+		ConvertToLlm: DefaultConvertToLlm,
+	}
+
+	err := RunAgentLoop(context.Background(), []AgentMessage{ai.NewUserMessage("hello")}, agentCtx, config, emit, errorStopStreamFn)
+	if err != nil {
+		t.Fatalf("RunAgentLoop returned error: %v", err)
+	}
+
+	types := eventTypes(events)
+	t.Logf("Events: %v", types)
+
+	// Must have EventMessageEnd even when stopReason is error
+	assertHasEvent(t, types, EventMessageStart)
+	assertHasEvent(t, types, EventMessageEnd)
+	assertHasEvent(t, types, EventTurnEnd)
+	assertHasEvent(t, types, EventAgentEnd)
+
+	// EventMessageEnd should carry the error assistant message
+	var assistantMsgEnd *Event
+	for i := range events {
+		if events[i].Type == EventMessageEnd && events[i].Msg.Role == "assistant" {
+			ev := events[i]
+			assistantMsgEnd = &ev
+			break
+		}
+	}
+	if assistantMsgEnd == nil {
+		t.Fatal("no EventMessageEnd with role=assistant found")
+	}
+	if assistantMsgEnd.Msg.Role != "assistant" {
+		t.Errorf("EventMessageEnd role = %q, want assistant", assistantMsgEnd.Msg.Role)
+	}
+}
+
 func indexOf(types []string, want string) int {
 	for i, got := range types {
 		if got == want {

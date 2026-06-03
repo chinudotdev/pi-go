@@ -18,6 +18,7 @@ import (
 	"github.com/chinudotdev/pi-go/agent/harness/env"
 	"github.com/chinudotdev/pi-go/agent/harness/session"
 	"github.com/chinudotdev/pi-go/ai"
+	"github.com/chinudotdev/pi-go/ai/providers"
 	"github.com/chinudotdev/pi-go/sdk/auth"
 	"github.com/chinudotdev/pi-go/sdk/config"
 	"github.com/chinudotdev/pi-go/sdk/models"
@@ -27,6 +28,10 @@ import (
 	sdkskills "github.com/chinudotdev/pi-go/sdk/skills"
 	sdktools "github.com/chinudotdev/pi-go/sdk/tools"
 )
+
+func init() {
+	providers.RegisterBuiltInApiProviders()
+}
 
 // ============================================================================
 // Types
