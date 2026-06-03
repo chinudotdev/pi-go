@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/chinudotdev/pi-go/agent/harness/session"
+	"github.com/chinudotdev/pi-go/ai"
 	"github.com/chinudotdev/pi-go/sdk/auth"
 	"github.com/chinudotdev/pi-go/sdk/models"
 	"github.com/chinudotdev/pi-go/sdk/resources"
@@ -198,7 +199,7 @@ func TestCreateSession_ThinkingLevel(t *testing.T) {
 		t.Fatalf("CreateSession failed: %v", err)
 	}
 	// Without a model, thinking level should be clamped to "off"
-	if result.Session.ThinkingLevel() != "off" {
+	if result.Session.ThinkingLevel() != ai.ThinkingOff {
 		t.Errorf("expected thinking level 'off' (no model), got %q", result.Session.ThinkingLevel())
 	}
 }
@@ -288,6 +289,7 @@ func TestCreateSession_HarnessAndSessionAccess(t *testing.T) {
 		t.Fatalf("CreateSession failed: %v", err)
 	}
 
+	// Deprecated escape hatches still work but are discouraged
 	if result.Session.Harness() == nil {
 		t.Error("expected non-nil harness")
 	}
@@ -324,6 +326,12 @@ func TestCreateSession_SessionStats(t *testing.T) {
 	}
 	if stats.SessionID == "" {
 		t.Error("expected non-empty session ID")
+	}
+	if stats.StartedAt.IsZero() {
+		t.Error("expected non-zero StartedAt")
+	}
+	if stats.Duration() < 0 {
+		t.Error("expected positive duration")
 	}
 	if stats.TotalMessages != 0 {
 		t.Errorf("expected 0 messages in fresh session, got %d", stats.TotalMessages)
@@ -438,6 +446,186 @@ func TestCreateSession_DefaultTools(t *testing.T) {
 	}
 	if !nameSet["read"] || !nameSet["bash"] {
 		t.Errorf("expected read and bash in default tools, got %v", names)
+	}
+}
+
+func TestSubscribe_Unsubscribe(t *testing.T) {
+	dir := tempDir(t)
+	sessDir := filepath.Join(dir, "sessions")
+	os.MkdirAll(sessDir, 0755)
+
+	authStorage, settingsMgr, modelReg := newTestDeps(t)
+	ctx := context.Background()
+
+	result, err := CreateSession(ctx, CreateSessionOptions{
+		CWD:           dir,
+		AgentDir:      dir,
+		AuthStorage:   authStorage,
+		SettingsMgr:   settingsMgr,
+		ModelRegistry: modelReg,
+		SessionDir:    sessDir,
+		NoTools:       true,
+	})
+	if err != nil {
+		t.Fatalf("CreateSession failed: %v", err)
+	}
+	sess := result.Session
+
+	var callCount int
+	listener := func(event SessionEvent) {
+		callCount++
+	}
+
+	// Subscribe and immediately unsubscribe
+	unsub := sess.Subscribe(listener)
+	unsub()
+
+	// Subscribe two listeners, unsubscribe first
+	_ = sess.Subscribe(listener)
+	unsub2 := sess.Subscribe(listener)
+	unsub2()
+
+	// Dispose should work fine with remaining listener
+	sess.Dispose(ctx)
+}
+
+func TestSubscribe_MultipleUnsubscribe(t *testing.T) {
+	dir := tempDir(t)
+	sessDir := filepath.Join(dir, "sessions")
+	os.MkdirAll(sessDir, 0755)
+
+	authStorage, settingsMgr, modelReg := newTestDeps(t)
+	ctx := context.Background()
+
+	result, err := CreateSession(ctx, CreateSessionOptions{
+		CWD:           dir,
+		AgentDir:      dir,
+		AuthStorage:   authStorage,
+		SettingsMgr:   settingsMgr,
+		ModelRegistry: modelReg,
+		SessionDir:    sessDir,
+		NoTools:       true,
+	})
+	if err != nil {
+		t.Fatalf("CreateSession failed: %v", err)
+	}
+
+	listener1 := func(event SessionEvent) {}
+	listener2 := func(event SessionEvent) {}
+
+	unsub1 := result.Session.Subscribe(listener1)
+	unsub2 := result.Session.Subscribe(listener2)
+
+	// Unsubscribe first listener
+	unsub1()
+
+	// Second should still be subscribed (no panic)
+	unsub2()
+
+	// Double unsubscribe should be safe
+	unsub1()
+}
+
+func TestCreateSession_NoToolsAndToolListConflict(t *testing.T) {
+	dir := tempDir(t)
+	sessDir := filepath.Join(dir, "sessions")
+	os.MkdirAll(sessDir, 0755)
+
+	authStorage, settingsMgr, modelReg := newTestDeps(t)
+	ctx := context.Background()
+
+	_, err := CreateSession(ctx, CreateSessionOptions{
+		CWD:           dir,
+		AgentDir:      dir,
+		AuthStorage:   authStorage,
+		SettingsMgr:   settingsMgr,
+		ModelRegistry: modelReg,
+		SessionDir:    sessDir,
+		NoTools:       true,
+		ToolList:      []string{"bash"},
+	})
+	if err == nil {
+		t.Fatal("expected error when NoTools and ToolList are both set")
+	}
+	if !strings.Contains(err.Error(), "NoTools") {
+		t.Errorf("expected NoTools conflict error, got: %v", err)
+	}
+}
+
+func TestCreateSession_ToolListAndExcludeConflict(t *testing.T) {
+	dir := tempDir(t)
+	sessDir := filepath.Join(dir, "sessions")
+	os.MkdirAll(sessDir, 0755)
+
+	authStorage, settingsMgr, modelReg := newTestDeps(t)
+	ctx := context.Background()
+
+	_, err := CreateSession(ctx, CreateSessionOptions{
+		CWD:          dir,
+		AgentDir:     dir,
+		AuthStorage:  authStorage,
+		SettingsMgr:  settingsMgr,
+		ModelRegistry: modelReg,
+		SessionDir:   sessDir,
+		ToolList:     []string{"bash"},
+		ExcludeTools: []string{"read"},
+	})
+	if err == nil {
+		t.Fatal("expected error when ToolList and ExcludeTools are both set")
+	}
+	if !strings.Contains(err.Error(), "mutually exclusive") {
+		t.Errorf("expected mutual exclusion error, got: %v", err)
+	}
+}
+
+func TestCreateSession_NoToolsAndExcludeConflict(t *testing.T) {
+	dir := tempDir(t)
+	sessDir := filepath.Join(dir, "sessions")
+	os.MkdirAll(sessDir, 0755)
+
+	authStorage, settingsMgr, modelReg := newTestDeps(t)
+	ctx := context.Background()
+
+	_, err := CreateSession(ctx, CreateSessionOptions{
+		CWD:          dir,
+		AgentDir:     dir,
+		AuthStorage:  authStorage,
+		SettingsMgr:  settingsMgr,
+		ModelRegistry: modelReg,
+		SessionDir:   sessDir,
+		NoTools:      true,
+		ExcludeTools: []string{"read"},
+	})
+	if err == nil {
+		t.Fatal("expected error when NoTools and ExcludeTools are both set")
+	}
+}
+
+func TestCycleThinkingLevel_NoModel(t *testing.T) {
+	dir := tempDir(t)
+	sessDir := filepath.Join(dir, "sessions")
+	os.MkdirAll(sessDir, 0755)
+
+	authStorage, settingsMgr, modelReg := newTestDeps(t)
+	ctx := context.Background()
+
+	result, err := CreateSession(ctx, CreateSessionOptions{
+		CWD:           dir,
+		AgentDir:      dir,
+		AuthStorage:   authStorage,
+		SettingsMgr:   settingsMgr,
+		ModelRegistry: modelReg,
+		SessionDir:    sessDir,
+		NoTools:       true,
+	})
+	if err != nil {
+		t.Fatalf("CreateSession failed: %v", err)
+	}
+
+	// No model → should return empty string
+	next := result.Session.CycleThinkingLevel(ctx)
+	if next != "" {
+		t.Errorf("expected empty string for cycle with no model, got %q", next)
 	}
 }
 

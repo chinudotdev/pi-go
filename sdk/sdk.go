@@ -5,6 +5,7 @@ package sdk
 
 import (
 	"context"
+	"crypto/rand"
 	"fmt"
 	"os"
 	"strings"
@@ -61,22 +62,28 @@ type SessionEventListener func(event SessionEvent)
 
 // ModelCycleResult holds the result of cycling to a different model.
 type ModelCycleResult struct {
-	Model         *ai.Model `json:"model"`
-	ThinkingLevel string    `json:"thinkingLevel"`
-	IsScoped      bool      `json:"isScoped"`
+	Model         *ai.Model             `json:"model"`
+	ThinkingLevel ai.ModelThinkingLevel `json:"thinkingLevel"`
+	IsScoped      bool                  `json:"isScoped"`
 }
 
 // SessionStats holds statistics about the current session.
 type SessionStats struct {
-	SessionID         string  `json:"sessionId"`
-	UserMessages      int     `json:"userMessages"`
-	AssistantMessages int     `json:"assistantMessages"`
-	ToolCalls         int     `json:"toolCalls"`
-	ToolResults       int     `json:"toolResults"`
-	TotalMessages     int     `json:"totalMessages"`
-	InputTokens       int64   `json:"inputTokens"`
-	OutputTokens      int64   `json:"outputTokens"`
-	Cost              float64 `json:"cost"`
+	SessionID         string    `json:"sessionId"`
+	StartedAt         time.Time `json:"startedAt"`
+	UserMessages      int       `json:"userMessages"`
+	AssistantMessages int       `json:"assistantMessages"`
+	ToolCalls         int       `json:"toolCalls"`
+	ToolResults       int       `json:"toolResults"`
+	TotalMessages     int       `json:"totalMessages"`
+	InputTokens       int64     `json:"inputTokens"`
+	OutputTokens      int64     `json:"outputTokens"`
+	Cost              float64   `json:"cost"`
+}
+
+// Duration returns the time elapsed since the session started.
+func (s *SessionStats) Duration() time.Duration {
+	return time.Since(s.StartedAt)
 }
 
 // CreateSessionOptions configures session creation.
@@ -89,7 +96,7 @@ type CreateSessionOptions struct {
 
 	// Model selection
 	Model         *ai.Model
-	ThinkingLevel string // "off", "minimal", "low", "medium", "high"
+	ThinkingLevel ai.ModelThinkingLevel // "off", "minimal", "low", "medium", "high"
 
 	// Tool configuration
 	NoTools      bool     // Disable all tools
@@ -132,20 +139,29 @@ type AgentSession struct {
 	cwd              string
 	agentDir         string
 	model            *ai.Model
-	thinkingLevel    string
+	thinkingLevel    ai.ModelThinkingLevel
 	baseSystemPrompt string
+	startedAt        time.Time
 
-	listeners    []SessionEventListener
-	scopedModels []scopedModelEntry
+	listenerPtrs []*SessionEventListener
+	scopedModels []ScopedModelEntry
 }
 
-type scopedModelEntry struct {
+// ScopedModelEntry pairs a model with a thinking level for scoped model cycling.
+type ScopedModelEntry struct {
 	Model         *ai.Model
-	ThinkingLevel string
+	ThinkingLevel ai.ModelThinkingLevel
 }
 
 // CreateSession creates a new agent session with the given options.
 func CreateSession(ctx context.Context, opts CreateSessionOptions) (*CreateSessionResult, error) {
+	// Validate tool configuration
+	if opts.NoTools && (len(opts.ToolList) > 0 || len(opts.ExcludeTools) > 0) {
+		return nil, fmt.Errorf("CreateSessionOptions: NoTools cannot be used with ToolList or ExcludeTools")
+	}
+	if len(opts.ToolList) > 0 && len(opts.ExcludeTools) > 0 {
+		return nil, fmt.Errorf("CreateSessionOptions: ToolList and ExcludeTools are mutually exclusive")
+	}
 	cwd := opts.CWD
 	if cwd == "" {
 		if wd, err := os.Getwd(); err == nil {
@@ -215,15 +231,15 @@ func CreateSession(ctx context.Context, opts CreateSessionOptions) (*CreateSessi
 	// Resolve thinking level
 	thinkingLevel := opts.ThinkingLevel
 	if thinkingLevel == "" {
-		thinkingLevel = settingsMgr.GetDefaultThinkingLevel()
+		thinkingLevel = ai.ModelThinkingLevel(settingsMgr.GetDefaultThinkingLevel())
 	}
 	if thinkingLevel == "" {
-		thinkingLevel = string(config.DefaultThinkingLevel)
+		thinkingLevel = ai.ModelThinkingLevel(config.DefaultThinkingLevel)
 	}
 	if model != nil {
-		thinkingLevel = string(ai.ClampThinkingLevel(model, ai.ModelThinkingLevel(thinkingLevel)))
+		thinkingLevel = ai.ClampThinkingLevel(model, thinkingLevel)
 	} else {
-		thinkingLevel = "off"
+		thinkingLevel = ai.ThinkingOff
 	}
 
 	// Build tool set
@@ -249,7 +265,7 @@ func CreateSession(ctx context.Context, opts CreateSessionOptions) (*CreateSessi
 	harnessOpts := harness.HarnessOptions{
 		Env:             localFs,
 		Model:           model,
-		ThinkingLevel:   thinkingLevel,
+		ThinkingLevel:   string(thinkingLevel),
 		SystemPrompt:    sysPrompt,
 		Tools:           toolConfigs.Tools,
 		ActiveToolNames: toolConfigs.ActiveNames,
@@ -276,7 +292,7 @@ func CreateSession(ctx context.Context, opts CreateSessionOptions) (*CreateSessi
 	if model != nil {
 		sess.AppendModelChange(ctx, model.Provider, model.ID)
 	}
-	sess.AppendThinkingLevelChange(ctx, thinkingLevel)
+	sess.AppendThinkingLevelChange(ctx, string(thinkingLevel))
 
 	as := &AgentSession{
 		harness:          h,
@@ -289,6 +305,7 @@ func CreateSession(ctx context.Context, opts CreateSessionOptions) (*CreateSessi
 		model:            model,
 		thinkingLevel:    thinkingLevel,
 		baseSystemPrompt: sysPrompt,
+		startedAt:        time.Now(),
 	}
 
 	return &CreateSessionResult{
@@ -342,13 +359,14 @@ func (s *AgentSession) WaitForIdle() {
 func (s *AgentSession) Subscribe(listener SessionEventListener) func() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	s.listeners = append(s.listeners, listener)
+	listenerPtr := &listener
+	s.listenerPtrs = append(s.listenerPtrs, listenerPtr)
 	return func() {
 		s.mu.Lock()
 		defer s.mu.Unlock()
-		for i, l := range s.listeners {
-			if &l == &listener {
-				s.listeners = append(s.listeners[:i], s.listeners[i+1:]...)
+		for i, p := range s.listenerPtrs {
+			if p == listenerPtr {
+				s.listenerPtrs = append(s.listenerPtrs[:i], s.listenerPtrs[i+1:]...)
 				break
 			}
 		}
@@ -360,7 +378,7 @@ func (s *AgentSession) Dispose(ctx context.Context) {
 	s.Abort(ctx)
 	s.harness.WaitForIdle()
 	s.mu.Lock()
-	s.listeners = nil
+	s.listenerPtrs = nil
 	s.mu.Unlock()
 }
 
@@ -374,7 +392,7 @@ func (s *AgentSession) Model() *ai.Model {
 }
 
 // ThinkingLevel returns the current thinking level.
-func (s *AgentSession) ThinkingLevel() string {
+func (s *AgentSession) ThinkingLevel() ai.ModelThinkingLevel {
 	return s.thinkingLevel
 }
 
@@ -404,11 +422,15 @@ func (s *AgentSession) Settings() *settings.Manager {
 }
 
 // Session returns the underlying session.
+// Deprecated: This exposes internal implementation details. File a feature request
+// if you need session-level access through the SDK.
 func (s *AgentSession) Session() *session.Session {
 	return s.sess
 }
 
 // Harness returns the underlying agent harness.
+// Deprecated: This exposes internal implementation details. File a feature request
+// if you need harness-level access through the SDK.
 func (s *AgentSession) Harness() *harness.AgentHarness {
 	return s.harness
 }
@@ -460,13 +482,13 @@ func (s *AgentSession) SetModel(ctx context.Context, model *ai.Model) error {
 	s.model = model
 	s.mu.Unlock()
 
-	tl := string(ai.ClampThinkingLevel(model, ai.ModelThinkingLevel(s.thinkingLevel)))
+	tl := ai.ClampThinkingLevel(model, s.thinkingLevel)
 	s.thinkingLevel = tl
 
 	if err := s.harness.SetModel(ctx, model); err != nil {
 		return err
 	}
-	s.harness.SetThinkingLevel(ctx, tl)
+	s.harness.SetThinkingLevel(ctx, string(tl))
 	s.sess.AppendModelChange(ctx, model.Provider, model.ID)
 	s.settingsMgr.SetDefaultModelAndProvider(model.Provider, model.ID)
 
@@ -516,7 +538,7 @@ func (s *AgentSession) CycleModel(ctx context.Context, direction string) (*Model
 }
 
 func (s *AgentSession) cycleScopedModel(direction string) (*ModelCycleResult, error) {
-	filtered := make([]scopedModelEntry, 0, len(s.scopedModels))
+	filtered := make([]ScopedModelEntry, 0, len(s.scopedModels))
 	for _, se := range s.scopedModels {
 		if s.modelReg.HasConfiguredAuth(se.Model) {
 			filtered = append(filtered, se)
@@ -550,7 +572,8 @@ func (s *AgentSession) cycleScopedModel(direction string) (*ModelCycleResult, er
 }
 
 // SetScopedModels configures models for cycling.
-func (s *AgentSession) SetScopedModels(entries []scopedModelEntry) {
+// SetScopedModels configures models for cycling.
+func (s *AgentSession) SetScopedModels(entries []ScopedModelEntry) {
 	s.scopedModels = entries
 }
 
@@ -559,19 +582,28 @@ func (s *AgentSession) SetScopedModels(entries []scopedModelEntry) {
 // ============================================================================
 
 // SetThinkingLevel changes the thinking level, clamped to model capabilities.
-func (s *AgentSession) SetThinkingLevel(ctx context.Context, level string) {
-	effective := string(ai.ClampThinkingLevel(s.model, ai.ModelThinkingLevel(level)))
+func (s *AgentSession) SetThinkingLevel(ctx context.Context, level ai.ModelThinkingLevel) {
+	effective := ai.ClampThinkingLevel(s.model, level)
 	s.mu.Lock()
 	s.thinkingLevel = effective
 	s.mu.Unlock()
-	s.harness.SetThinkingLevel(ctx, effective)
-	s.sess.AppendThinkingLevelChange(ctx, effective)
-	s.settingsMgr.SetDefaultThinkingLevel(effective)
+	s.harness.SetThinkingLevel(ctx, string(effective))
+	s.sess.AppendThinkingLevelChange(ctx, string(effective))
+	s.settingsMgr.SetDefaultThinkingLevel(string(effective))
 }
 
-// CycleThinkingLevel cycles to the next thinking level.
-func (s *AgentSession) CycleThinkingLevel(ctx context.Context) string {
-	levels := []string{"off", "minimal", "low", "medium", "high"}
+// CycleThinkingLevel cycles to the next available thinking level for the current model.
+// Returns empty string if the model does not support reasoning.
+func (s *AgentSession) CycleThinkingLevel(ctx context.Context) ai.ModelThinkingLevel {
+	if s.model == nil || !s.model.Reasoning {
+		return ""
+	}
+
+	levels := ai.GetSupportedThinkingLevels(s.model)
+	if len(levels) == 0 {
+		return ""
+	}
+
 	idx := 0
 	for i, l := range levels {
 		if l == s.thinkingLevel {
@@ -588,9 +620,24 @@ func (s *AgentSession) CycleThinkingLevel(ctx context.Context) string {
 // Compaction
 // ============================================================================
 
+// CompactionResult holds the output of a compaction operation.
+type CompactionResult struct {
+	Summary          string `json:"summary"`
+	FirstKeptEntryID string `json:"firstKeptEntryId"`
+	TokensBefore     int    `json:"tokensBefore"`
+}
+
 // Compact manually compacts the session context.
-func (s *AgentSession) Compact(ctx context.Context, customInstructions string) (*harness.CompactionResult, error) {
-	return s.harness.Compact(ctx, customInstructions)
+func (s *AgentSession) Compact(ctx context.Context, customInstructions string) (*CompactionResult, error) {
+	res, err := s.harness.Compact(ctx, customInstructions)
+	if err != nil {
+		return nil, err
+	}
+	return &CompactionResult{
+		Summary:          res.Summary,
+		FirstKeptEntryID: res.FirstKeptEntryID,
+		TokensBefore:     res.TokensBefore,
+	}, nil
 }
 
 // ============================================================================
@@ -604,7 +651,9 @@ func (s *AgentSession) GetSessionStats(ctx context.Context) (*SessionStats, erro
 		return nil, err
 	}
 
-	stats := &SessionStats{}
+	stats := &SessionStats{
+		StartedAt: s.startedAt,
+	}
 	meta, err := s.sess.GetMetadata(ctx)
 	if err == nil {
 		stats.SessionID = meta.ID
@@ -672,9 +721,54 @@ func (s *AgentSession) GetLastAssistantText(ctx context.Context) string {
 // Harness Events
 // ============================================================================
 
-// On registers a handler for a specific harness event type.
-func (s *AgentSession) On(eventType string, handler harness.HarnessEventHandler) {
-	s.harness.On(eventType, handler)
+// SessionEventType identifies the type of a session event.
+type SessionEventType string
+
+const (
+	EventTypeQueueUpdate       SessionEventType = "queue_update"
+	EventTypeSavePoint         SessionEventType = "save_point"
+	EventTypeAbort             SessionEventType = "abort"
+	EventTypeSettled           SessionEventType = "settled"
+	EventTypeBeforeAgentStart  SessionEventType = "before_agent_start"
+	EventTypeContext           SessionEventType = "context"
+	EventTypeBeforeRequest     SessionEventType = "before_provider_request"
+	EventTypeBeforePayload     SessionEventType = "before_provider_payload"
+	EventTypeAfterResponse    SessionEventType = "after_provider_response"
+	EventTypeToolCall         SessionEventType = "tool_call"
+	EventTypeToolResult       SessionEventType = "tool_result"
+	EventTypeModelUpdate      SessionEventType = "model_update"
+	EventTypeThinkingUpdate   SessionEventType = "thinking_level_update"
+	EventTypeToolsUpdate      SessionEventType = "tools_update"
+	EventTypeResourcesUpdate  SessionEventType = "resources_update"
+	EventTypeBeforeCompact    SessionEventType = "session_before_compact"
+	EventTypeCompact          SessionEventType = "session_compact"
+	EventTypeBeforeTree       SessionEventType = "session_before_tree"
+	EventTypeTree             SessionEventType = "session_tree"
+)
+
+// SessionEventHandler processes a session event.
+// Return nil to continue, or a hook result to modify behavior.
+type SessionEventHandler func(event SessionEvent) (any, error)
+
+// On registers a handler for a specific session event type.
+// This is an advanced API for fine-grained event handling.
+func (s *AgentSession) On(eventType string, handler SessionEventHandler) {
+	s.harness.On(eventType, func(event harness.HarnessEvent) (any, error) {
+		return handler(sdkEventFromHarness(event))
+	})
+}
+
+func sdkEventFromHarness(he harness.HarnessEvent) SessionEvent {
+	return SessionEvent{
+		Type:         he.Type,
+		ToolName:     he.ToolName,
+		ToolCallID:   he.ToolCallID,
+		ErrorMessage: "",
+		Model:        he.Model,
+		Reason:       "",
+		Steering:     nil,
+		FollowUp:     nil,
+	}
 }
 
 // ============================================================================
@@ -804,8 +898,11 @@ func compactionSettingsFromManager(mgr *settings.Manager) harness.CompactionSett
 
 func generateSessionID() string {
 	b := make([]byte, 8)
-	for i := range b {
-		b[i] = "0123456789abcdef"[time.Now().UnixNano()%16]
+	if _, err := rand.Read(b); err != nil {
+		// Fallback to timestamp-based if crypto/rand fails
+		for i := range b {
+			b[i] = byte(time.Now().UnixNano())
+		}
 	}
-	return fmt.Sprintf("sess_%d_%s", time.Now().UnixMilli(), string(b))
+	return fmt.Sprintf("sess_%d_%x", time.Now().UnixMilli(), b)
 }
