@@ -17,25 +17,25 @@ type BranchSummaryDetails struct {
 
 // BranchPreparation holds prepared branch content for summarization.
 type BranchPreparation struct {
-	Messages    []ai.Message    // Messages selected for the branch summary
-	FileOps     FileOperations  // File operations extracted from the branch
-	TotalTokens int             // Estimated token count for selected messages
+	Messages    []ai.Message   // Messages selected for the branch summary
+	FileOps     FileOperations // File operations extracted from the branch
+	TotalTokens int            // Estimated token count for selected messages
 }
 
 // CollectEntriesResult holds entries selected for branch summarization.
 type CollectEntriesResult struct {
-	Entries         []harness.SessionTreeEntry // Entries to summarize in chronological order
-	CommonAncestorID *string                   // Deepest common ancestor between old leaf and target
+	Entries          []harness.SessionTreeEntry // Entries to summarize in chronological order
+	CommonAncestorID *string                    // Deepest common ancestor between old leaf and target
 }
 
 // GenerateBranchSummaryOptions holds options for generating a branch summary.
 type GenerateBranchSummaryOptions struct {
-	Model              ai.Model        // Model used for summarization
-	APIKey             string          // API key forwarded to the provider
-	Headers            map[string]string // Optional request headers
-	CustomInstructions string          // Optional instructions appended to the prompt
-	ReplaceInstructions bool           // Replace the default prompt instead of appending
-	ReserveTokens      int             // Tokens reserved for prompt and output (default 16384)
+	Model               ai.Model          // Model used for summarization
+	APIKey              string            // API key forwarded to the provider
+	Headers             map[string]string // Optional request headers
+	CustomInstructions  string            // Optional instructions appended to the prompt
+	ReplaceInstructions bool              // Replace the default prompt instead of appending
+	ReserveTokens       int               // Tokens reserved for prompt and output (default 16384)
 }
 
 // CollectEntriesForBranchSummary collects entries that should be summarized before navigating.

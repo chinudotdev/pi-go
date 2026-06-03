@@ -184,10 +184,10 @@ func TestSanitizeBinaryOutput(t *testing.T) {
 	}{
 		{"hello", "hello"},
 		{"hello\tworld\n", "hello\tworld\n"},
-		{"hello\x00world", "helloworld"},              // null byte removed
-		{"hello\x01world", "helloworld"},              // control char removed
-		{"hello\r\nworld", "hello\r\nworld"},          // CR LF kept
-		{"text\xEF\xBF\xB9more", "textmore"},           // interlinear annotation removed
+		{"hello\x00world", "helloworld"},     // null byte removed
+		{"hello\x01world", "helloworld"},     // control char removed
+		{"hello\r\nworld", "hello\r\nworld"}, // CR LF kept
+		{"text\xEF\xBF\xB9more", "textmore"}, // interlinear annotation removed
 	}
 	for _, tt := range tests {
 		got := SanitizeBinaryOutput(tt.input)

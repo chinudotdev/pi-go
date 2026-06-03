@@ -22,7 +22,7 @@ import (
 type MistralOptions struct {
 	ai.StreamOptions
 	ToolChoice      any    `json:"toolChoice,omitempty"`
-	PromptMode      string `json:"promptMode,omitempty"` // "reasoning"
+	PromptMode      string `json:"promptMode,omitempty"`      // "reasoning"
 	ReasoningEffort string `json:"reasoningEffort,omitempty"` // "none" | "high"
 }
 
@@ -65,4 +65,3 @@ func StreamSimpleMistral(ctx context.Context, model *ai.Model, convCtx *ai.Conte
 	baseOpts := ai.BuildBaseOptions(model, nil, apiKey)
 	return StreamMistral(ctx, model, convCtx, &baseOpts)
 }
-

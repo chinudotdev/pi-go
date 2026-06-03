@@ -217,7 +217,7 @@ func TestAgentHarness_ProviderRequestOptionsMerge(t *testing.T) {
 	retries := 3
 	h.SetStreamOptions(context.Background(), HarnessStreamOptions{
 		MaxRetries: &retries,
-		Headers:   map[string]string{"base": "yes", "remove": "me"},
+		Headers:    map[string]string{"base": "yes", "remove": "me"},
 	})
 
 	ctx := context.Background()
@@ -353,7 +353,7 @@ func TestAgentHarness_SteeringDrainOneAtATime(t *testing.T) {
 	// Create a provider that counts calls and keeps running across multiple turns
 	callCount := int64(0)
 	providerCalls := int64(0)
-	
+
 	ai.RegisterApiProvider(ai.ApiProvider{
 		API: ai.Api(apiName),
 		Stream: func(ctx context.Context, model *ai.Model, convCtx *ai.Context, options *ai.StreamOptions) (*ai.EventStream, error) {
@@ -401,9 +401,9 @@ func TestAgentHarness_SteeringDrainOneAtATime(t *testing.T) {
 	sess := newMockSession()
 	model := &ai.Model{ID: "steer-model", Provider: "test", API: apiName}
 	opts := HarnessOptions{
-		Model:         model,
-		Tools:         []agent.Tool{echoTool},
-		SteeringMode:  agent.QueueOneAtATime,
+		Model:        model,
+		Tools:        []agent.Tool{echoTool},
+		SteeringMode: agent.QueueOneAtATime,
 		GetApiKeyAndHeaders: func(m *ai.Model) (*AuthInfo, error) {
 			return &AuthInfo{APIKey: "key"}, nil
 		},

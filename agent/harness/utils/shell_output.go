@@ -16,10 +16,10 @@ type ShellCaptureOptions struct {
 
 // ShellCaptureResult holds the captured output of a shell command.
 type ShellCaptureResult struct {
-	Output       string // Truncated output (tail)
-	ExitCode     int    // 0 on success
-	Cancelled    bool
-	Truncated    bool
+	Output         string // Truncated output (tail)
+	ExitCode       int    // 0 on success
+	Cancelled      bool
+	Truncated      bool
 	FullOutputPath string // Path to full output log if truncated
 }
 
@@ -60,9 +60,9 @@ func ExecuteShellWithCapture(
 	}
 
 	execOpts := &harness.ExecOptions{
-		Cwd:     opts.Cwd,
-		Env:     opts.Env,
-		Timeout: opts.Timeout,
+		Cwd:      opts.Cwd,
+		Env:      opts.Env,
+		Timeout:  opts.Timeout,
 		OnStdout: onChunk,
 		OnStderr: onChunk,
 	}
@@ -88,8 +88,8 @@ func ExecuteShellWithCapture(
 	truncResult := TruncateTail(tail, TruncationOptions{})
 
 	return harness.OkResult(ShellCaptureResult{
-		Output:   truncResult.Content,
-		ExitCode: result.Value.ExitCode,
+		Output:    truncResult.Content,
+		ExitCode:  result.Value.ExitCode,
 		Truncated: truncResult.Truncated,
 	})
 }

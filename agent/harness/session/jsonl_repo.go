@@ -13,9 +13,9 @@ import (
 
 // JsonlSessionRepo manages JSONL-backed sessions on the filesystem.
 type JsonlSessionRepo struct {
-	fs              JsonlRepoFileSystem
-	sessionsRootIn  string
-	sessionsRoot    *string
+	fs             JsonlRepoFileSystem
+	sessionsRootIn string
+	sessionsRoot   *string
 }
 
 // NewJsonlSessionRepo creates a new JSONL session repository.

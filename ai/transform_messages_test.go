@@ -92,7 +92,7 @@ func TestTransformMessages_InsertsSyntheticToolResults(t *testing.T) {
 func TestTransformMessages_DowngradesImagesForNonVisionModel(t *testing.T) {
 	model := &Model{
 		Input:    []string{"text"}, // no "image"
-		Provider: "deepseek", API:  "openai-completions",
+		Provider: "deepseek", API: "openai-completions",
 	}
 	messages := []Message{
 		NewUserMessageWithContent([]ContentBlock{
@@ -163,7 +163,7 @@ func TestTransformMessages_KeepsThinking_SameModel(t *testing.T) {
 		{
 			Role:     "assistant",
 			Provider: "anthropic", API: "anthropic-messages",
-			Model:    "claude-sonnet-4-20250514",
+			Model: "claude-sonnet-4-20250514",
 			AssistantContent: []ContentBlock{
 				{Type: "thinking", Thinking: "reasoning", ThinkingSignature: &sig},
 			},

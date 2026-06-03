@@ -202,16 +202,16 @@ type Event struct {
 
 // Event type constants.
 const (
-	EventAgentStart         = "agent_start"
-	EventAgentEnd           = "agent_end"
-	EventTurnStart          = "turn_start"
-	EventTurnEnd            = "turn_end"
-	EventMessageStart       = "message_start"
-	EventMessageUpdate      = "message_update"
-	EventMessageEnd         = "message_end"
-	EventToolExecutionStart = "tool_execution_start"
+	EventAgentStart          = "agent_start"
+	EventAgentEnd            = "agent_end"
+	EventTurnStart           = "turn_start"
+	EventTurnEnd             = "turn_end"
+	EventMessageStart        = "message_start"
+	EventMessageUpdate       = "message_update"
+	EventMessageEnd          = "message_end"
+	EventToolExecutionStart  = "tool_execution_start"
 	EventToolExecutionUpdate = "tool_execution_update"
-	EventToolExecutionEnd   = "tool_execution_end"
+	EventToolExecutionEnd    = "tool_execution_end"
 )
 
 // ============================================================================
@@ -220,13 +220,13 @@ const (
 
 // LoopConfig is the configuration for a single agent loop run.
 type LoopConfig struct {
-	Model         *ai.Model
-	Reasoning     ThinkingLevel
-	SessionID     *string
-	Transport     ai.Transport
+	Model           *ai.Model
+	Reasoning       ThinkingLevel
+	SessionID       *string
+	Transport       ai.Transport
 	ThinkingBudgets *ai.ThinkingBudgets
 	MaxRetryDelayMs *int
-	ToolExecution ToolExecutionMode
+	ToolExecution   ToolExecutionMode
 
 	// ConvertToLlm converts AgentMessage[] to ai.Message[] before each LLM call.
 	ConvertToLlm func(messages []AgentMessage) ([]ai.Message, error)
@@ -351,8 +351,8 @@ func agentToolsToAITools(tools []*Tool) []ai.Tool {
 	return result
 }
 
-func stringPtr(s string) *string { return &s }
-func intPtr(i int) *int          { return &i }
+func stringPtr(s string) *string    { return &s }
+func intPtr(i int) *int             { return &i }
 func float64Ptr(f float64) *float64 { return &f }
 
 func errorf(format string, args ...any) error {

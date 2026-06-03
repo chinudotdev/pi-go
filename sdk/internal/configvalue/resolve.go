@@ -19,8 +19,8 @@ import (
 
 // Cache for shell command results (persists for process lifetime).
 var (
-	cacheMu   sync.Mutex
-	cmdCache  = make(map[string]*string)
+	cacheMu  sync.Mutex
+	cmdCache = make(map[string]*string)
 )
 
 // Env variable name validation.
@@ -32,8 +32,8 @@ var (
 
 // templatePart is either a literal string or an env var reference.
 type templatePart struct {
-	typ  string // "literal" or "env"
-	val  string // literal value or env var name
+	typ string // "literal" or "env"
+	val string // literal value or env var name
 }
 
 // configValueRef is a parsed config value: either a shell command or a template.

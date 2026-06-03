@@ -16,9 +16,9 @@ import (
 
 // BashToolOptions configures the bash tool.
 type BashToolOptions struct {
-	Operations   BashOperations
+	Operations    BashOperations
 	CommandPrefix string
-	ShellPath    string
+	ShellPath     string
 }
 
 // BashOperations are pluggable operations for the bash tool.

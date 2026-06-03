@@ -28,9 +28,9 @@ const (
 
 // CompactionSettings controls context compaction behavior.
 type CompactionSettings struct {
-	Enabled         *bool `json:"enabled,omitempty"`
-	ReserveTokens   *int  `json:"reserveTokens,omitempty"`
-	KeepRecentTokens *int `json:"keepRecentTokens,omitempty"`
+	Enabled          *bool `json:"enabled,omitempty"`
+	ReserveTokens    *int  `json:"reserveTokens,omitempty"`
+	KeepRecentTokens *int  `json:"keepRecentTokens,omitempty"`
 }
 
 // BranchSummarySettings controls branch summarization.
@@ -41,24 +41,24 @@ type BranchSummarySettings struct {
 
 // ProviderRetrySettings controls provider-level retry behavior.
 type ProviderRetrySettings struct {
-	TimeoutMs      *int `json:"timeoutMs,omitempty"`
-	MaxRetries     *int `json:"maxRetries,omitempty"`
+	TimeoutMs       *int `json:"timeoutMs,omitempty"`
+	MaxRetries      *int `json:"maxRetries,omitempty"`
 	MaxRetryDelayMs *int `json:"maxRetryDelayMs,omitempty"`
 }
 
 // RetrySettings controls auto-retry behavior.
 type RetrySettings struct {
-	Enabled    *bool                 `json:"enabled,omitempty"`
-	MaxRetries *int                  `json:"maxRetries,omitempty"`
-	BaseDelayMs *int                 `json:"baseDelayMs,omitempty"`
-	Provider   *ProviderRetrySettings `json:"provider,omitempty"`
+	Enabled     *bool                  `json:"enabled,omitempty"`
+	MaxRetries  *int                   `json:"maxRetries,omitempty"`
+	BaseDelayMs *int                   `json:"baseDelayMs,omitempty"`
+	Provider    *ProviderRetrySettings `json:"provider,omitempty"`
 }
 
 // TerminalSettings controls terminal display options.
 type TerminalSettings struct {
-	ShowImages          *bool `json:"showImages,omitempty"`
-	ImageWidthCells     *int  `json:"imageWidthCells,omitempty"`
-	ClearOnShrink       *bool `json:"clearOnShrink,omitempty"`
+	ShowImages           *bool `json:"showImages,omitempty"`
+	ImageWidthCells      *int  `json:"imageWidthCells,omitempty"`
+	ClearOnShrink        *bool `json:"clearOnShrink,omitempty"`
 	ShowTerminalProgress *bool `json:"showTerminalProgress,omitempty"`
 }
 
@@ -227,13 +227,13 @@ func (msb *MemoryStorageBackend) WithLock(scope Scope, fn func(current []byte) *
 
 // Manager loads, merges, and persists settings from global + project scopes.
 type Manager struct {
-	storage          StorageBackend
-	globalSettings   Settings
-	projectSettings  Settings
-	settings         Settings // merged result
-	modifiedFields   map[string]bool
-	errors           []Error
-	mu               sync.RWMutex
+	storage         StorageBackend
+	globalSettings  Settings
+	projectSettings Settings
+	settings        Settings // merged result
+	modifiedFields  map[string]bool
+	errors          []Error
+	mu              sync.RWMutex
 }
 
 // NewManager creates a Manager from a storage backend.

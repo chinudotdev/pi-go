@@ -77,7 +77,7 @@ func TestValidateSkillName(t *testing.T) {
 	}{
 		{"my-skill", "my-skill", 0},
 		{"wrong-name", "right-name", 1},
-		{"UPPER", "upper", 2},                  // case mismatch + invalid chars
+		{"UPPER", "upper", 2},                   // case mismatch + invalid chars
 		{"a", "a", 0},                           // too short? no, just 1 char
 		{"-leading", "-leading", 1},             // starts with hyphen
 		{"trailing-", "trailing-", 1},           // ends with hyphen

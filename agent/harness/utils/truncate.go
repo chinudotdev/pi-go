@@ -13,17 +13,17 @@ const (
 
 // TruncationResult holds the result of a truncation operation.
 type TruncationResult struct {
-	Content            string `json:"content"`
-	Truncated          bool   `json:"truncated"`
-	TruncatedBy        string `json:"truncatedBy,omitempty"` // "lines", "bytes", or ""
-	TotalLines         int    `json:"totalLines"`
-	TotalBytes         int    `json:"totalBytes"`
-	OutputLines        int    `json:"outputLines"`
-	OutputBytes        int    `json:"outputBytes"`
-	LastLinePartial    bool   `json:"lastLinePartial"`
-	FirstLineExceeds   bool   `json:"firstLineExceeds"`
-	MaxLines           int    `json:"maxLines"`
-	MaxBytes           int    `json:"maxBytes"`
+	Content          string `json:"content"`
+	Truncated        bool   `json:"truncated"`
+	TruncatedBy      string `json:"truncatedBy,omitempty"` // "lines", "bytes", or ""
+	TotalLines       int    `json:"totalLines"`
+	TotalBytes       int    `json:"totalBytes"`
+	OutputLines      int    `json:"outputLines"`
+	OutputBytes      int    `json:"outputBytes"`
+	LastLinePartial  bool   `json:"lastLinePartial"`
+	FirstLineExceeds bool   `json:"firstLineExceeds"`
+	MaxLines         int    `json:"maxLines"`
+	MaxBytes         int    `json:"maxBytes"`
 }
 
 // TruncationOptions controls truncation limits.

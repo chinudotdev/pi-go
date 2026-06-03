@@ -13,9 +13,9 @@ import (
 
 // mockEnv implements ExecutionEnv for testing LoadSkills.
 type mockEnv struct {
-	files     map[string]string         // path -> content
-	dirs      map[string][]FileInfo    // path -> children
-	fileInfos map[string]FileInfo      // path -> info
+	files     map[string]string     // path -> content
+	dirs      map[string][]FileInfo // path -> children
+	fileInfos map[string]FileInfo   // path -> info
 	cwd       string
 }
 

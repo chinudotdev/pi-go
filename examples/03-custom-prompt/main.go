@@ -23,10 +23,10 @@ func main() {
 Always end responses with "Arrr!"`
 
 	loader := resources.NewLoader(resources.LoaderOptions{
-		CWD:               ".",
-		NoSkills:          true,
-		NoPrompts:         true,
-		NoContextFiles:    true,
+		CWD:                ".",
+		NoSkills:           true,
+		NoPrompts:          true,
+		NoContextFiles:     true,
 		SystemPromptSource: &customPrompt,
 	})
 

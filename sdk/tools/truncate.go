@@ -15,17 +15,17 @@ const (
 
 // TruncationResult holds metadata about a truncation operation.
 type TruncationResult struct {
-	Content            string // The truncated content
-	Truncated          bool   // Whether truncation occurred
-	TruncatedBy        string // "lines", "bytes", or "" if not truncated
-	TotalLines         int    // Lines in the original content
-	TotalBytes         int    // Bytes in the original content
-	OutputLines        int    // Complete lines in the truncated output
-	OutputBytes        int    // Bytes in the truncated output
-	LastLinePartial    bool   // Whether the last line was partially truncated (tail mode)
-	FirstLineExceeds   bool   // Whether the first line exceeded the byte limit (head mode)
-	MaxLines           int    // The max lines limit applied
-	MaxBytes           int    // The max bytes limit applied
+	Content          string // The truncated content
+	Truncated        bool   // Whether truncation occurred
+	TruncatedBy      string // "lines", "bytes", or "" if not truncated
+	TotalLines       int    // Lines in the original content
+	TotalBytes       int    // Bytes in the original content
+	OutputLines      int    // Complete lines in the truncated output
+	OutputBytes      int    // Bytes in the truncated output
+	LastLinePartial  bool   // Whether the last line was partially truncated (tail mode)
+	FirstLineExceeds bool   // Whether the first line exceeded the byte limit (head mode)
+	MaxLines         int    // The max lines limit applied
+	MaxBytes         int    // The max bytes limit applied
 }
 
 // TruncationOptions configures truncation limits.
@@ -79,7 +79,7 @@ func TruncateHead(content string, opts ...TruncationOptions) TruncationResult {
 			TotalLines: totalLines, TotalBytes: totalBytes,
 			OutputLines: 0, OutputBytes: 0,
 			FirstLineExceeds: true,
-			MaxLines: opt.MaxLines, MaxBytes: opt.MaxBytes,
+			MaxLines:         opt.MaxLines, MaxBytes: opt.MaxBytes,
 		}
 	}
 
@@ -182,7 +182,7 @@ func TruncateTail(content string, opts ...TruncationOptions) TruncationResult {
 		TotalLines: totalLines, TotalBytes: totalBytes,
 		OutputLines: len(outputLines), OutputBytes: len([]byte(result)),
 		LastLinePartial: lastLinePartial,
-		MaxLines: opt.MaxLines, MaxBytes: opt.MaxBytes,
+		MaxLines:        opt.MaxLines, MaxBytes: opt.MaxBytes,
 	}
 }
 

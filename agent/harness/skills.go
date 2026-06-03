@@ -277,10 +277,10 @@ func loadSkillFromFile(ctx context.Context, env ExecutionEnv, filePath string) (
 	}
 
 	return &Skill{
-		Name:                name,
-		Description:         description,
-		Content:             body,
-		FilePath:            filePath,
+		Name:                   name,
+		Description:            description,
+		Content:                body,
+		FilePath:               filePath,
 		DisableModelInvocation: disableModelInvocation,
 	}, diagnostics
 }
@@ -465,5 +465,3 @@ func errorString(err error) string {
 	}
 	return err.Error()
 }
-
-

@@ -69,4 +69,3 @@ func StreamSimpleOpenAIResponses(ctx context.Context, model *ai.Model, convCtx *
 	baseOpts := ai.BuildBaseOptions(model, nil, apiKey)
 	return StreamOpenAIResponses(ctx, model, convCtx, &baseOpts)
 }
-

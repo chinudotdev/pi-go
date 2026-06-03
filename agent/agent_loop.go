@@ -286,8 +286,8 @@ func streamAssistantResponse(
 					agentCtx.Messages[len(agentCtx.Messages)-1] = asMsg
 				}
 				_ = emit(Event{
-					Type:                  EventMessageUpdate,
-					Msg:          asMsg,
+					Type:        EventMessageUpdate,
+					Msg:         asMsg,
 					StreamEvent: &ev,
 				})
 			}
@@ -342,5 +342,3 @@ func streamAssistantResponse(
 func defaultStreamFn(ctx context.Context, model *ai.Model, convCtx *ai.Context, opts *ai.SimpleStreamOptions) (*ai.EventStream, error) {
 	return ai.StreamSimple(ctx, model, convCtx, opts)
 }
-
-

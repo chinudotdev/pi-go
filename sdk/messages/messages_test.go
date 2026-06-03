@@ -116,9 +116,9 @@ func TestConvertToLlm_MixedMessages(t *testing.T) {
 func TestConvertToLlm_Passthrough(t *testing.T) {
 	// Assistant messages pass through unchanged
 	msg := ai.Message{
-		Role:            "assistant",
+		Role:             "assistant",
 		AssistantContent: []ai.ContentBlock{ai.NewTextContent("response")},
-		Timestamp:       1000,
+		Timestamp:        1000,
 	}
 	result := ConvertToLlm([]ai.Message{msg})
 	if len(result) != 1 {

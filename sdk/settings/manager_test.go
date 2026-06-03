@@ -93,8 +93,8 @@ func TestDeepMerge(t *testing.T) {
 	base := Settings{
 		DefaultProvider: ptrString("anthropic"),
 		Compaction: &CompactionSettings{
-			Enabled:        ptrBool(true),
-			ReserveTokens:  ptrInt(10000),
+			Enabled:       ptrBool(true),
+			ReserveTokens: ptrInt(10000),
 		},
 	}
 
@@ -130,8 +130,8 @@ func TestSettingsJSON(t *testing.T) {
 		DefaultProvider: ptrString("anthropic"),
 		DefaultModel:    ptrString("claude-4"),
 		Compaction: &CompactionSettings{
-			Enabled:        ptrBool(true),
-			ReserveTokens:  ptrInt(16384),
+			Enabled:       ptrBool(true),
+			ReserveTokens: ptrInt(16384),
 		},
 		Skills: []string{"/path/to/skills"},
 	}

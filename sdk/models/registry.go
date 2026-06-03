@@ -56,42 +56,42 @@ type modelsJSONConfig struct {
 }
 
 type providerConfig struct {
-	Name           string                    `json:"name,omitempty"`
-	BaseURL        string                    `json:"baseUrl,omitempty"`
-	APIKey         string                    `json:"apiKey,omitempty"`
-	API            string                    `json:"api,omitempty"`
-	Headers        map[string]string         `json:"headers,omitempty"`
-	Compat         any                       `json:"compat,omitempty"`
-	AuthHeader     bool                      `json:"authHeader,omitempty"`
-	Models         []modelDefinition         `json:"models,omitempty"`
-	ModelOverrides map[string]modelOverride  `json:"modelOverrides,omitempty"`
+	Name           string                   `json:"name,omitempty"`
+	BaseURL        string                   `json:"baseUrl,omitempty"`
+	APIKey         string                   `json:"apiKey,omitempty"`
+	API            string                   `json:"api,omitempty"`
+	Headers        map[string]string        `json:"headers,omitempty"`
+	Compat         any                      `json:"compat,omitempty"`
+	AuthHeader     bool                     `json:"authHeader,omitempty"`
+	Models         []modelDefinition        `json:"models,omitempty"`
+	ModelOverrides map[string]modelOverride `json:"modelOverrides,omitempty"`
 }
 
 type modelDefinition struct {
-	ID               string         `json:"id"`
-	Name             string         `json:"name,omitempty"`
-	API              string         `json:"api,omitempty"`
-	BaseURL          string         `json:"baseUrl,omitempty"`
-	Reasoning        bool           `json:"reasoning,omitempty"`
-	ThinkingLevelMap map[string]any `json:"thinkingLevelMap,omitempty"`
-	Input            []string       `json:"input,omitempty"`
-	Cost             *modelCost     `json:"cost,omitempty"`
-	ContextWindow    int            `json:"contextWindow,omitempty"`
-	MaxTokens        int            `json:"maxTokens,omitempty"`
+	ID               string            `json:"id"`
+	Name             string            `json:"name,omitempty"`
+	API              string            `json:"api,omitempty"`
+	BaseURL          string            `json:"baseUrl,omitempty"`
+	Reasoning        bool              `json:"reasoning,omitempty"`
+	ThinkingLevelMap map[string]any    `json:"thinkingLevelMap,omitempty"`
+	Input            []string          `json:"input,omitempty"`
+	Cost             *modelCost        `json:"cost,omitempty"`
+	ContextWindow    int               `json:"contextWindow,omitempty"`
+	MaxTokens        int               `json:"maxTokens,omitempty"`
 	Headers          map[string]string `json:"headers,omitempty"`
-	Compat           any            `json:"compat,omitempty"`
+	Compat           any               `json:"compat,omitempty"`
 }
 
 type modelOverride struct {
-	Name             string         `json:"name,omitempty"`
-	Reasoning        *bool          `json:"reasoning,omitempty"`
-	ThinkingLevelMap map[string]any `json:"thinkingLevelMap,omitempty"`
-	Input            []string       `json:"input,omitempty"`
-	Cost             *modelCost     `json:"cost,omitempty"`
-	ContextWindow    *int           `json:"contextWindow,omitempty"`
-	MaxTokens        *int           `json:"maxTokens,omitempty"`
+	Name             string            `json:"name,omitempty"`
+	Reasoning        *bool             `json:"reasoning,omitempty"`
+	ThinkingLevelMap map[string]any    `json:"thinkingLevelMap,omitempty"`
+	Input            []string          `json:"input,omitempty"`
+	Cost             *modelCost        `json:"cost,omitempty"`
+	ContextWindow    *int              `json:"contextWindow,omitempty"`
+	MaxTokens        *int              `json:"maxTokens,omitempty"`
 	Headers          map[string]string `json:"headers,omitempty"`
-	Compat           any            `json:"compat,omitempty"`
+	Compat           any               `json:"compat,omitempty"`
 }
 
 type modelCost struct {
@@ -107,24 +107,24 @@ type modelCost struct {
 
 // BuiltinProviderDisplayNames maps provider IDs to human-readable names.
 var BuiltinProviderDisplayNames = map[string]string{
-	"anthropic":               "Anthropic",
-	"amazon-bedrock":          "Amazon Bedrock",
-	"azure-openai-responses":  "Azure OpenAI Responses",
-	"cerebras":                "Cerebras",
-	"deepseek":                "DeepSeek",
-	"fireworks":               "Fireworks",
-	"google":                  "Google Gemini",
-	"google-vertex":           "Google Vertex AI",
-	"groq":                    "Groq",
-	"huggingface":             "Hugging Face",
-	"mistral":                 "Mistral",
-	"minimax":                 "MiniMax",
-	"moonshotai":              "Moonshot AI",
-	"openai":                  "OpenAI",
-	"openrouter":              "OpenRouter",
-	"together":                "Together AI",
-	"xai":                     "xAI",
-	"zai":                     "ZAI",
+	"anthropic":              "Anthropic",
+	"amazon-bedrock":         "Amazon Bedrock",
+	"azure-openai-responses": "Azure OpenAI Responses",
+	"cerebras":               "Cerebras",
+	"deepseek":               "DeepSeek",
+	"fireworks":              "Fireworks",
+	"google":                 "Google Gemini",
+	"google-vertex":          "Google Vertex AI",
+	"groq":                   "Groq",
+	"huggingface":            "Hugging Face",
+	"mistral":                "Mistral",
+	"minimax":                "MiniMax",
+	"moonshotai":             "Moonshot AI",
+	"openai":                 "OpenAI",
+	"openrouter":             "OpenRouter",
+	"together":               "Together AI",
+	"xai":                    "xAI",
+	"zai":                    "ZAI",
 }
 
 // ============================================================================
@@ -133,14 +133,14 @@ var BuiltinProviderDisplayNames = map[string]string{
 
 // Registry manages model discovery and API key resolution.
 type Registry struct {
-	mu                    sync.RWMutex
-	models                []*ai.Model
-	authStorage           *auth.Storage
-	providerConfigs       map[string]*providerRequestConfig
-	modelHeaders          map[string]map[string]string // "provider:modelId" -> headers
-	registeredProviders   map[string]*providerConfig
-	loadError             string
-	modelsJSONPath        string
+	mu                  sync.RWMutex
+	models              []*ai.Model
+	authStorage         *auth.Storage
+	providerConfigs     map[string]*providerRequestConfig
+	modelHeaders        map[string]map[string]string // "provider:modelId" -> headers
+	registeredProviders map[string]*providerConfig
+	loadError           string
+	modelsJSONPath      string
 }
 
 // NewRegistry creates a new model registry.

@@ -30,15 +30,15 @@ func createFailureMessage(model *ai.Model, errMsg string, aborted bool) ai.Messa
 		stopReason = ai.StopReasonAborted
 	}
 	return ai.Message{
-		Role:         "assistant",
+		Role:             "assistant",
 		AssistantContent: []ai.ContentBlock{ai.NewTextContent("")},
-		API:          model.API,
-		Provider:     model.Provider,
-		Model:        model.ID,
-		StopReason:   stopReason,
-		ErrorMessage: &errMsg,
-		Timestamp:    time.Now().UnixMilli(),
-		Usage:        ai.Usage{},
+		API:              model.API,
+		Provider:         model.Provider,
+		Model:            model.ID,
+		StopReason:       stopReason,
+		ErrorMessage:     &errMsg,
+		Timestamp:        time.Now().UnixMilli(),
+		Usage:            ai.Usage{},
 	}
 }
 
@@ -101,7 +101,7 @@ type AgentHarness struct {
 	env  ExecutionEnv
 	sess SessionProvider
 
-	mu   sync.Mutex
+	mu    sync.Mutex
 	phase HarnessPhase
 
 	cancelFunc context.CancelFunc
@@ -116,7 +116,7 @@ type AgentHarness struct {
 	getAuth       GetApiKeyAndHeadersFn
 	resources     HarnessResources
 
-	tools          map[string]agent.Tool
+	tools           map[string]agent.Tool
 	activeToolNames []string
 
 	steerQueue    []ai.Message
@@ -126,39 +126,39 @@ type AgentHarness struct {
 	nextTurnQueue []ai.Message
 
 	// Compaction functions (injected)
-	compactFn              CompactionFunc
-	prepareCompactionFn    PrepareCompactionFunc
+	compactFn                   CompactionFunc
+	prepareCompactionFn         PrepareCompactionFunc
 	defaultCompactionSettingsFn func() any
-	collectBranchEntriesFn CollectBranchEntriesFunc
-	generateBranchSummaryFn GenerateBranchSummaryFunc
+	collectBranchEntriesFn      CollectBranchEntriesFunc
+	generateBranchSummaryFn     GenerateBranchSummaryFunc
 
-	handlers map[string][]HarnessEventHandler
+	handlers    map[string][]HarnessEventHandler
 	allHandlers []HarnessEventHandler
 }
 
 // NewAgentHarness creates a new harness from the given options.
 func NewAgentHarness(opts HarnessOptions, sess SessionProvider) *AgentHarness {
 	h := &AgentHarness{
-		env:            opts.Env,
-		sess:           sess,
-		resources:      derefResources(opts.Resources),
-		streamOptions:  cloneStreamOptions(opts.StreamOptions),
-		systemPrompt:   opts.SystemPrompt,
-		getAuth:        opts.GetApiKeyAndHeaders,
-		model:          opts.Model,
-		thinkingLevel:  opts.ThinkingLevel,
-		tools:          make(map[string]agent.Tool),
+		env:             opts.Env,
+		sess:            sess,
+		resources:       derefResources(opts.Resources),
+		streamOptions:   cloneStreamOptions(opts.StreamOptions),
+		systemPrompt:    opts.SystemPrompt,
+		getAuth:         opts.GetApiKeyAndHeaders,
+		model:           opts.Model,
+		thinkingLevel:   opts.ThinkingLevel,
+		tools:           make(map[string]agent.Tool),
 		activeToolNames: make([]string, 0),
-		steeringMode:   opts.SteeringMode,
-		followUpMode:   opts.FollowUpMode,
-		handlers:       make(map[string][]HarnessEventHandler),
-		allHandlers:    make([]HarnessEventHandler, 0),
+		steeringMode:    opts.SteeringMode,
+		followUpMode:    opts.FollowUpMode,
+		handlers:        make(map[string][]HarnessEventHandler),
+		allHandlers:     make([]HarnessEventHandler, 0),
 
-		compactFn:              opts.CompactFn,
-		prepareCompactionFn:    opts.PrepareCompactionFn,
+		compactFn:                   opts.CompactFn,
+		prepareCompactionFn:         opts.PrepareCompactionFn,
 		defaultCompactionSettingsFn: opts.DefaultCompactionSettingsFn,
-		collectBranchEntriesFn: opts.CollectBranchEntriesFn,
-		generateBranchSummaryFn: opts.GenerateBranchSummaryFn,
+		collectBranchEntriesFn:      opts.CollectBranchEntriesFn,
+		generateBranchSummaryFn:     opts.GenerateBranchSummaryFn,
 	}
 
 	// Validate and register tools
@@ -549,8 +549,8 @@ func (h *AgentHarness) SetThinkingLevel(ctx context.Context, level string) error
 	}
 	h.thinkingLevel = level
 	return h.emitOwn(ctx, HarnessEvent{
-		Type:         "thinking_level_update",
-		Level:        level,
+		Type:          "thinking_level_update",
+		Level:         level,
 		PreviousLevel: prev,
 	})
 }
@@ -615,12 +615,12 @@ func (h *AgentHarness) SetTools(ctx context.Context, tools []agent.Tool, activeT
 	h.mu.Unlock()
 
 	return h.emitOwn(ctx, HarnessEvent{
-		Type:                   "tools_update",
-		ToolNames:              h.toolNames(),
-		PreviousToolNames:      prevNames,
-		ActiveToolNamesEvt:     make([]string, len(nextActive)),
+		Type:                    "tools_update",
+		ToolNames:               h.toolNames(),
+		PreviousToolNames:       prevNames,
+		ActiveToolNamesEvt:      make([]string, len(nextActive)),
 		PreviousActiveToolNames: prevActive,
-		Source:                 "set",
+		Source:                  "set",
 	})
 }
 
@@ -668,12 +668,12 @@ func (h *AgentHarness) SetActiveTools(ctx context.Context, toolNames []string) e
 	h.mu.Unlock()
 
 	return h.emitOwn(ctx, HarnessEvent{
-		Type:                   "tools_update",
-		ToolNames:              h.toolNames(),
-		PreviousToolNames:      prevNames,
-		ActiveToolNamesEvt:     make([]string, len(toolNames)),
+		Type:                    "tools_update",
+		ToolNames:               h.toolNames(),
+		PreviousToolNames:       prevNames,
+		ActiveToolNamesEvt:      make([]string, len(toolNames)),
 		PreviousActiveToolNames: prevActive,
-		Source:                 "set",
+		Source:                  "set",
 	})
 }
 
@@ -691,8 +691,8 @@ func (h *AgentHarness) SetResources(ctx context.Context, resources HarnessResour
 	h.resources = resources
 	h.mu.Unlock()
 	return h.emitOwn(ctx, HarnessEvent{
-		Type:             "resources_update",
-		Resources:        &resources,
+		Type:              "resources_update",
+		Resources:         &resources,
 		PreviousResources: &prev,
 	})
 }
@@ -745,8 +745,8 @@ func (h *AgentHarness) Abort(ctx context.Context) (*AbortResult, error) {
 	}
 	h.waitForIdle()
 	if err := h.emitOwn(ctx, HarnessEvent{
-		Type:           "abort",
-		ClearedSteer:   clearedSteer,
+		Type:            "abort",
+		ClearedSteer:    clearedSteer,
 		ClearedFollowUp: clearedFollowUp,
 	}); err != nil {
 		errs = append(errs, err)
@@ -1221,8 +1221,8 @@ func (h *AgentHarness) copyResources() HarnessResources {
 }
 
 func (h *AgentHarness) steerQueueCopy() []ai.Message    { return copyMessages(h.steerQueue) }
-func (h *AgentHarness) followUpQueueCopy() []ai.Message  { return copyMessages(h.followUpQueue) }
-func (h *AgentHarness) nextTurnQueueCopy() []ai.Message   { return copyMessages(h.nextTurnQueue) }
+func (h *AgentHarness) followUpQueueCopy() []ai.Message { return copyMessages(h.followUpQueue) }
+func (h *AgentHarness) nextTurnQueueCopy() []ai.Message { return copyMessages(h.nextTurnQueue) }
 
 func copyMessages(src []ai.Message) []ai.Message {
 	if src == nil {

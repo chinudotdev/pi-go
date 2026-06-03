@@ -21,11 +21,11 @@ const maxDescriptionLength = 1024
 
 // Skill represents a loaded skill.
 type Skill struct {
-	Name                 string
-	Description          string
-	FilePath             string
-	BaseDir              string
-	SourceInfo           sourceinfo.Info
+	Name                   string
+	Description            string
+	FilePath               string
+	BaseDir                string
+	SourceInfo             sourceinfo.Info
 	DisableModelInvocation bool
 }
 
@@ -44,17 +44,17 @@ type Diagnostic struct {
 
 // SkillFrontmatter holds parsed frontmatter from a skill file.
 type SkillFrontmatter struct {
-	Name                  string `yaml:"name"`
-	Description           string `yaml:"description"`
-	DisableModelInvocation bool  `yaml:"disable-model-invocation"`
+	Name                   string `yaml:"name"`
+	Description            string `yaml:"description"`
+	DisableModelInvocation bool   `yaml:"disable-model-invocation"`
 }
 
 // LoadSkillsOptions configures skill loading.
 type LoadSkillsOptions struct {
-	CWD            string   // Working directory for project-local skills
-	AgentDir       string   // Agent config directory for global skills
-	SkillPaths     []string // Explicit skill paths
-	IncludeDefaults bool    // Include default skill directories
+	CWD             string   // Working directory for project-local skills
+	AgentDir        string   // Agent config directory for global skills
+	SkillPaths      []string // Explicit skill paths
+	IncludeDefaults bool     // Include default skill directories
 }
 
 // LoadSkills loads skills from all configured locations.
@@ -291,11 +291,11 @@ func loadSkillFromFile(filePath, source string) singleSkillResult {
 
 	return singleSkillResult{
 		Skill: &Skill{
-			Name:                 name,
-			Description:          frontmatter.Description,
-			FilePath:             filePath,
-			BaseDir:              skillDir,
-			SourceInfo:           sourceinfo.Synthetic(filePath, source),
+			Name:                   name,
+			Description:            frontmatter.Description,
+			FilePath:               filePath,
+			BaseDir:                skillDir,
+			SourceInfo:             sourceinfo.Synthetic(filePath, source),
 			DisableModelInvocation: frontmatter.DisableModelInvocation,
 		},
 		Diagnostics: diagnostics,

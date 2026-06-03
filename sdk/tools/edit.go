@@ -263,10 +263,10 @@ func normalizeForFuzzyMatch(text string) string {
 }
 
 type fuzzyMatchResult struct {
-	found               bool
-	index               int
-	matchLength         int
-	usedFuzzyMatch      bool
+	found                 bool
+	index                 int
+	matchLength           int
+	usedFuzzyMatch        bool
 	contentForReplacement string
 }
 
@@ -286,10 +286,10 @@ func fuzzyFindText(content, oldText string) fuzzyMatchResult {
 	}
 
 	return fuzzyMatchResult{
-		found:                true,
-		index:                fuzzyIdx,
-		matchLength:          len(fuzzyOldText),
-		usedFuzzyMatch:       true,
+		found:                 true,
+		index:                 fuzzyIdx,
+		matchLength:           len(fuzzyOldText),
+		usedFuzzyMatch:        true,
 		contentForReplacement: fuzzyContent,
 	}
 }
@@ -491,7 +491,7 @@ func generateDiffString(oldContent, newContent string) string {
 }
 
 type diffOp struct {
-	kind  string   // "equal", "delete", "insert"
+	kind  string // "equal", "delete", "insert"
 	lines []string
 }
 

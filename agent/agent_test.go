@@ -433,7 +433,7 @@ func TestRunAgentLoop_TransformContext(t *testing.T) {
 	config := &LoopConfig{
 		Model:            testModel(),
 		ConvertToLlm:     convertFn,
-		TransformContext:  transformCtx,
+		TransformContext: transformCtx,
 	}
 
 	err := RunAgentLoop(context.Background(), []AgentMessage{ai.NewUserMessage("m3"), ai.NewUserMessage("m4")}, agentCtx, config, emit, mockStreamFn("ok"))
@@ -506,7 +506,7 @@ func TestRunAgentLoop_ParallelExecution(t *testing.T) {
 				return &ToolResult{
 					Content: []ai.ContentBlock{ai.NewTextContent(name + " done")},
 					Details: map[string]any{},
-			}, nil
+				}, nil
 			},
 		}
 	}
@@ -1681,7 +1681,7 @@ func TestAgent_AwaitAsyncSubscribers(t *testing.T) {
 
 	agent := New(Options{
 		InitialState: &InitialState{Model: testModel()},
-		StreamFn:    mockStreamFn("ok"),
+		StreamFn:     mockStreamFn("ok"),
 	})
 
 	agent.Subscribe(func(e Event) error {
@@ -1795,7 +1795,7 @@ func TestAgent_AbortSignalPropagation(t *testing.T) {
 func TestAgent_StateMutators(t *testing.T) {
 	agent := New(Options{
 		InitialState: &InitialState{Model: testModel()},
-		StreamFn:    mockStreamFn("ok"),
+		StreamFn:     mockStreamFn("ok"),
 	})
 
 	// Test SetSystemPrompt
@@ -1835,7 +1835,7 @@ func TestAgent_StateMutators(t *testing.T) {
 func TestAgent_FollowUpQueue(t *testing.T) {
 	agent := New(Options{
 		InitialState: &InitialState{Model: testModel()},
-		StreamFn:    mockStreamFn("ok"),
+		StreamFn:     mockStreamFn("ok"),
 	})
 
 	msg := ai.NewUserMessage("follow up")
@@ -1867,7 +1867,7 @@ func TestAgent_FollowUpQueue(t *testing.T) {
 func TestAgent_AbortWhenIdle(t *testing.T) {
 	agent := New(Options{
 		InitialState: &InitialState{Model: testModel()},
-		StreamFn:    mockStreamFn("ok"),
+		StreamFn:     mockStreamFn("ok"),
 	})
 
 	// Should not panic

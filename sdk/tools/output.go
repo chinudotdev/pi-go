@@ -11,8 +11,8 @@ import (
 
 // OutputSnapshot is a point-in-time view of accumulated output.
 type OutputSnapshot struct {
-	Content       string
-	Truncation    TruncationResult
+	Content        string
+	Truncation     TruncationResult
 	FullOutputPath string
 }
 
@@ -20,22 +20,22 @@ type OutputSnapshot struct {
 // It keeps only a decoded tail for display snapshots and optionally writes to
 // a temp file when the full output needs to be preserved.
 type OutputAccumulator struct {
-	maxLines     int
-	maxBytes     int
-	maxRolling   int
-	tempPrefix   string
+	maxLines   int
+	maxBytes   int
+	maxRolling int
+	tempPrefix string
 
-	mu            sync.Mutex
-	tailText      string
-	tailBytes     int
+	mu                 sync.Mutex
+	tailText           string
+	tailBytes          int
 	tailAtLineBoundary bool
-	totalRawBytes int
-	totalDecoded  int
-	completedLines int
-	totalLines    int
-	currentLineBytes int
-	hasOpenLine   bool
-	finished      bool
+	totalRawBytes      int
+	totalDecoded       int
+	completedLines     int
+	totalLines         int
+	currentLineBytes   int
+	hasOpenLine        bool
+	finished           bool
 
 	tempFilePath string
 	tempFile     *os.File
@@ -72,9 +72,9 @@ func NewOutputAccumulator(opts ...OutputAccumulatorOptions) *OutputAccumulator {
 
 // OutputAccumulatorOptions configures the output accumulator.
 type OutputAccumulatorOptions struct {
-	MaxLines        int
-	MaxBytes        int
-	TempFilePrefix  string
+	MaxLines       int
+	MaxBytes       int
+	TempFilePrefix string
 }
 
 // Append adds data to the accumulator.
@@ -135,16 +135,16 @@ func (a *OutputAccumulator) Snapshot(persistIfTruncated ...bool) OutputSnapshot 
 	}
 
 	truncation := TruncationResult{
-		Content:     tailTruncation.Content,
-		Truncated:   truncated,
-		TruncatedBy: truncatedBy,
-		TotalLines:  a.totalLines,
-		TotalBytes:  a.totalDecoded,
-		OutputLines: tailTruncation.OutputLines,
-		OutputBytes: tailTruncation.OutputBytes,
+		Content:         tailTruncation.Content,
+		Truncated:       truncated,
+		TruncatedBy:     truncatedBy,
+		TotalLines:      a.totalLines,
+		TotalBytes:      a.totalDecoded,
+		OutputLines:     tailTruncation.OutputLines,
+		OutputBytes:     tailTruncation.OutputBytes,
 		LastLinePartial: tailTruncation.LastLinePartial,
-		MaxLines:    a.maxLines,
-		MaxBytes:    a.maxBytes,
+		MaxLines:        a.maxLines,
+		MaxBytes:        a.maxBytes,
 	}
 
 	if len(persistIfTruncated) > 0 && persistIfTruncated[0] && truncation.Truncated {

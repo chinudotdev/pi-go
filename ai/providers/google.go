@@ -21,14 +21,14 @@ import (
 // GoogleOptions extends StreamOptions with Google-specific parameters.
 type GoogleOptions struct {
 	ai.StreamOptions
-	ToolChoice string `json:"toolChoice,omitempty"` // "auto" | "none" | "any"
+	ToolChoice string                `json:"toolChoice,omitempty"` // "auto" | "none" | "any"
 	Thinking   *GoogleThinkingConfig `json:"thinking,omitempty"`
 }
 
 // GoogleThinkingConfig configures thinking for Google models.
 type GoogleThinkingConfig struct {
-	Enabled      bool  `json:"enabled"`
-	BudgetTokens *int  `json:"budgetTokens,omitempty"` // -1 for dynamic, 0 to disable
+	Enabled      bool   `json:"enabled"`
+	BudgetTokens *int   `json:"budgetTokens,omitempty"` // -1 for dynamic, 0 to disable
 	Level        string `json:"level,omitempty"`        // GoogleThinkingLevel
 }
 
@@ -73,4 +73,3 @@ func StreamSimpleGoogle(ctx context.Context, model *ai.Model, convCtx *ai.Contex
 	baseOpts := ai.BuildBaseOptions(model, nil, apiKey)
 	return StreamGoogle(ctx, model, convCtx, &baseOpts)
 }
-

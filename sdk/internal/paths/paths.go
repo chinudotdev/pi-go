@@ -28,10 +28,10 @@ var unicodeSpacesRe = strings.NewReplacer(
 
 // NormalizeOptions controls NormalizePath behavior.
 type NormalizeOptions struct {
-	Trim                  bool
-	ExpandTilde           bool // default true
-	HomeDir               string
-	StripAtPrefix         bool
+	Trim                   bool
+	ExpandTilde            bool // default true
+	HomeDir                string
+	StripAtPrefix          bool
 	NormalizeUnicodeSpaces bool
 }
 

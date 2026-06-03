@@ -105,19 +105,19 @@ func (a *Agent) createLoopConfig(skipInitialSteeringPoll bool) *LoopConfig {
 	defer a.mu.RUnlock()
 
 	return &LoopConfig{
-		Model:           a.state.model,
-		Reasoning:       a.state.thinkingLevel,
-		SessionID:       a.sessionID,
-		Transport:       a.transport,
-		ThinkingBudgets: a.thinkingBudgets,
-		MaxRetryDelayMs: a.maxRetryDelayMs,
-		ToolExecution:   a.toolExecution,
-		ConvertToLlm:    a.convertToLlm,
-		TransformContext: a.transformContext,
-		GetApiKey:       a.getApiKey,
-		BeforeToolCall:  a.beforeToolCall,
-		AfterToolCall:   a.afterToolCall,
-		PrepareNextTurn: a.wrapPrepareNextTurn(),
+		Model:               a.state.model,
+		Reasoning:           a.state.thinkingLevel,
+		SessionID:           a.sessionID,
+		Transport:           a.transport,
+		ThinkingBudgets:     a.thinkingBudgets,
+		MaxRetryDelayMs:     a.maxRetryDelayMs,
+		ToolExecution:       a.toolExecution,
+		ConvertToLlm:        a.convertToLlm,
+		TransformContext:    a.transformContext,
+		GetApiKey:           a.getApiKey,
+		BeforeToolCall:      a.beforeToolCall,
+		AfterToolCall:       a.afterToolCall,
+		PrepareNextTurn:     a.wrapPrepareNextTurn(),
 		ShouldStopAfterTurn: nil, // set externally if needed
 		GetSteeringMessages: func() ([]AgentMessage, error) {
 			if skipInitialSteeringPoll {

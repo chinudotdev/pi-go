@@ -35,12 +35,12 @@ type ApiKeyCredential struct {
 
 // OAuthCredential holds an OAuth token set.
 type OAuthCredential struct {
-	Type      CredentialType `json:"type"`
-	Token     string         `json:"accessToken"`
-	Refresh   string         `json:"refreshToken,omitempty"`
-	Expires   int64          `json:"expires"`
-	Scopes    []string       `json:"scopes,omitempty"`
-	ClientID  string         `json:"clientId,omitempty"`
+	Type     CredentialType `json:"type"`
+	Token    string         `json:"accessToken"`
+	Refresh  string         `json:"refreshToken,omitempty"`
+	Expires  int64          `json:"expires"`
+	Scopes   []string       `json:"scopes,omitempty"`
+	ClientID string         `json:"clientId,omitempty"`
 }
 
 // Credential is a union of credential types.
@@ -96,9 +96,9 @@ type Backend interface {
 
 // FileBackend stores credentials in a JSON file with file locking.
 type FileBackend struct {
-	path    string
-	mu      sync.Mutex // process-level lock (file-level lock via flock for multi-process)
-	fileMu  sync.Mutex // serialize file I/O
+	path   string
+	mu     sync.Mutex // process-level lock (file-level lock via flock for multi-process)
+	fileMu sync.Mutex // serialize file I/O
 }
 
 // NewFileBackend creates a file-backed auth storage at the given path.
@@ -179,13 +179,13 @@ func (mb *MemoryBackend) WithLock(fn func(current []byte) LockResult) (any, erro
 
 // Storage manages credentials with support for multiple resolution sources.
 type Storage struct {
-	backend           Backend
-	data              StorageData
-	runtimeOverrides  map[string]string
-	fallbackResolver  func(provider string) *string
-	loadError         error
-	errors            []error
-	mu                sync.RWMutex
+	backend          Backend
+	data             StorageData
+	runtimeOverrides map[string]string
+	fallbackResolver func(provider string) *string
+	loadError        error
+	errors           []error
+	mu               sync.RWMutex
 }
 
 // NewStorage creates a Storage using the given backend.

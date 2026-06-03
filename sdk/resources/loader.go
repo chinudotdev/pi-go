@@ -19,7 +19,7 @@ const ConfigDirName = config.ConfigDirName // ".pi"
 
 // Diagnostic represents a warning or error during resource loading.
 type Diagnostic struct {
-	Type    string `json:"type"`    // "warning", "error", "collision"
+	Type    string `json:"type"` // "warning", "error", "collision"
 	Message string `json:"message"`
 	Path    string `json:"path"`
 }
@@ -57,23 +57,23 @@ type LoaderOptions struct {
 	AgentDir string // Agent config directory (~/.pi/agent)
 
 	// Disable specific resource types
-	NoSkills        bool
-	NoPrompts       bool
-	NoContextFiles  bool
+	NoSkills       bool
+	NoPrompts      bool
+	NoContextFiles bool
 
 	// Additional paths
 	AdditionalSkillPaths  []string
 	AdditionalPromptPaths []string
 
 	// Overrides
-	SystemPromptSource       *string   // File path or raw text
-	AppendSystemPromptSource []string  // File paths or raw text
+	SystemPromptSource       *string  // File path or raw text
+	AppendSystemPromptSource []string // File paths or raw text
 }
 
 // Loader discovers and loads resources from the filesystem.
 type Loader struct {
-	opts LoaderOptions
-	cwd  string
+	opts     LoaderOptions
+	cwd      string
 	agentDir string
 }
 

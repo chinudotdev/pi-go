@@ -10,11 +10,11 @@ import (
 
 // Skill represents a loaded skill from a SKILL.md file.
 type Skill struct {
-	Name                string `json:"name"`
-	Description         string `json:"description"`
-	Content             string `json:"content"`
-	FilePath            string `json:"filePath"`
-	DisableModelInvocation bool  `json:"disableModelInvocation,omitempty"`
+	Name                   string `json:"name"`
+	Description            string `json:"description"`
+	Content                string `json:"content"`
+	FilePath               string `json:"filePath"`
+	DisableModelInvocation bool   `json:"disableModelInvocation,omitempty"`
 }
 
 // PromptTemplate is a named template for generating prompts.
@@ -32,13 +32,13 @@ type HarnessResources struct {
 
 // HarnessStreamOptions holds curated provider request options.
 type HarnessStreamOptions struct {
-	Transport       ai.Transport        `json:"transport,omitempty"`
-	TimeoutMs       *int                `json:"timeoutMs,omitempty"`
-	MaxRetries      *int                `json:"maxRetries,omitempty"`
-	MaxRetryDelayMs *int                `json:"maxRetryDelayMs,omitempty"`
-	Headers         map[string]string   `json:"headers,omitempty"`
-	Metadata        map[string]any      `json:"metadata,omitempty"`
-	CacheRetention  *ai.CacheRetention  `json:"cacheRetention,omitempty"`
+	Transport       ai.Transport       `json:"transport,omitempty"`
+	TimeoutMs       *int               `json:"timeoutMs,omitempty"`
+	MaxRetries      *int               `json:"maxRetries,omitempty"`
+	MaxRetryDelayMs *int               `json:"maxRetryDelayMs,omitempty"`
+	Headers         map[string]string  `json:"headers,omitempty"`
+	Metadata        map[string]any     `json:"metadata,omitempty"`
+	CacheRetention  *ai.CacheRetention `json:"cacheRetention,omitempty"`
 }
 
 // Clone returns a deep copy of the stream options.
@@ -215,25 +215,25 @@ type GenerateBranchSummaryFunc func(ctx context.Context, entries []SessionTreeEn
 
 // HarnessOptions configures an AgentHarness.
 type HarnessOptions struct {
-	Env              ExecutionEnv
-	Resources        *HarnessResources
-	StreamOptions    *HarnessStreamOptions
-	SystemPrompt     any // string or SystemPromptFn
+	Env                 ExecutionEnv
+	Resources           *HarnessResources
+	StreamOptions       *HarnessStreamOptions
+	SystemPrompt        any // string or SystemPromptFn
 	GetApiKeyAndHeaders GetApiKeyAndHeadersFn
-	Tools            []agent.Tool
-	ActiveToolNames  []string
-	Model            *ai.Model
-	ThinkingLevel    string
-	SteeringMode     agent.QueueMode
-	FollowUpMode     agent.QueueMode
+	Tools               []agent.Tool
+	ActiveToolNames     []string
+	Model               *ai.Model
+	ThinkingLevel       string
+	SteeringMode        agent.QueueMode
+	FollowUpMode        agent.QueueMode
 
 	// Compaction/branch functions (injected to avoid import cycles).
 	// Wire these from the compaction package at the call site.
-	CompactFn              CompactionFunc
-	PrepareCompactionFn    PrepareCompactionFunc
+	CompactFn                   CompactionFunc
+	PrepareCompactionFn         PrepareCompactionFunc
 	DefaultCompactionSettingsFn func() any
-	CollectBranchEntriesFn CollectBranchEntriesFunc
-	GenerateBranchSummaryFn GenerateBranchSummaryFunc
+	CollectBranchEntriesFn      CollectBranchEntriesFunc
+	GenerateBranchSummaryFn     GenerateBranchSummaryFunc
 }
 
 // ============================================================================

@@ -36,10 +36,10 @@ type HarnessEvent struct {
 	NextTurnCount int `json:"nextTurnCount,omitempty"`
 
 	// before_agent_start
-	Prompt       string             `json:"prompt,omitempty"`
-	Images       []ai.ContentBlock  `json:"images,omitempty"`
-	SystemPrompt string             `json:"systemPrompt,omitempty"`
-	Resources    *HarnessResources  `json:"resources,omitempty"`
+	Prompt       string            `json:"prompt,omitempty"`
+	Images       []ai.ContentBlock `json:"images,omitempty"`
+	SystemPrompt string            `json:"systemPrompt,omitempty"`
+	Resources    *HarnessResources `json:"resources,omitempty"`
 
 	// context
 	Messages []ai.Message `json:"messages,omitempty"`
@@ -53,7 +53,7 @@ type HarnessEvent struct {
 	Payload any `json:"payload,omitempty"`
 
 	// after_provider_response
-	Status int               `json:"status,omitempty"`
+	Status  int               `json:"status,omitempty"`
 	Headers map[string]string `json:"responseHeaders,omitempty"`
 
 	// tool_call, tool_result
@@ -66,10 +66,10 @@ type HarnessEvent struct {
 	IsError bool              `json:"isError,omitempty"`
 
 	// session_before_compact, session_compact
-	CompactionEntry   *CompactionEntry `json:"compactionEntry,omitempty"`
-	Preparation       any              `json:"preparation,omitempty"`
-	BranchEntries     []SessionTreeEntry `json:"branchEntries,omitempty"`
-	CustomInstructions *string         `json:"customInstructions,omitempty"`
+	CompactionEntry    *CompactionEntry   `json:"compactionEntry,omitempty"`
+	Preparation        any                `json:"preparation,omitempty"`
+	BranchEntries      []SessionTreeEntry `json:"branchEntries,omitempty"`
+	CustomInstructions *string            `json:"customInstructions,omitempty"`
 
 	// session_before_tree, session_tree
 	NewLeafID    *string             `json:"newLeafId,omitempty"`
@@ -85,9 +85,9 @@ type HarnessEvent struct {
 	PreviousLevel string `json:"previousLevel,omitempty"`
 
 	// tools_update
-	ToolNames             []string `json:"toolNames,omitempty"`
-	PreviousToolNames     []string `json:"previousToolNames,omitempty"`
-	ActiveToolNamesEvt    []string `json:"activeToolNamesEvt,omitempty"`
+	ToolNames               []string `json:"toolNames,omitempty"`
+	PreviousToolNames       []string `json:"previousToolNames,omitempty"`
+	ActiveToolNamesEvt      []string `json:"activeToolNamesEvt,omitempty"`
 	PreviousActiveToolNames []string `json:"previousActiveToolNames,omitempty"`
 
 	// resources_update
@@ -133,26 +133,26 @@ type ToolResultPatch struct {
 
 // SessionBeforeCompactResult allows cancelling or providing compaction.
 type SessionBeforeCompactResult struct {
-	Cancel     bool          `json:"cancel,omitempty"`
+	Cancel     bool           `json:"cancel,omitempty"`
 	Compaction *CompactResult `json:"compaction,omitempty"`
 }
 
 // SessionBeforeTreeResult allows cancelling or providing a branch summary.
 type SessionBeforeTreeResult struct {
-	Cancel           bool   `json:"cancel,omitempty"`
-	Summary          *string `json:"summary,omitempty"`
-	Details          any    `json:"details,omitempty"`
+	Cancel              bool    `json:"cancel,omitempty"`
+	Summary             *string `json:"summary,omitempty"`
+	Details             any     `json:"details,omitempty"`
 	CustomInstructions  *string `json:"customInstructions,omitempty"`
-	ReplaceInstructions *bool `json:"replaceInstructions,omitempty"`
-	Label            *string `json:"label,omitempty"`
+	ReplaceInstructions *bool   `json:"replaceInstructions,omitempty"`
+	Label               *string `json:"label,omitempty"`
 }
 
 // CompactResult holds the output of a compaction operation.
 type CompactResult struct {
-	Summary         string `json:"summary"`
+	Summary          string `json:"summary"`
 	FirstKeptEntryID string `json:"firstKeptEntryId"`
-	TokensBefore    int    `json:"tokensBefore"`
-	Details         any    `json:"details,omitempty"`
+	TokensBefore     int    `json:"tokensBefore"`
+	Details          any    `json:"details,omitempty"`
 }
 
 // FileOperations tracks file reads/writes during a turn.
@@ -164,16 +164,16 @@ type FileOperations struct {
 
 // CompactionSettings configures compaction behavior.
 type CompactionSettings struct {
-	Enabled        bool `json:"enabled"`
-	ReserveTokens  int  `json:"reserveTokens"`
-	KeepRecentTokens int `json:"keepRecentTokens"`
+	Enabled          bool `json:"enabled"`
+	ReserveTokens    int  `json:"reserveTokens"`
+	KeepRecentTokens int  `json:"keepRecentTokens"`
 }
 
 // DefaultCompactionSettings returns the default compaction settings.
 func DefaultCompactionSettings() CompactionSettings {
 	return CompactionSettings{
-		Enabled:        true,
-		ReserveTokens:  8000,
+		Enabled:          true,
+		ReserveTokens:    8000,
 		KeepRecentTokens: 4000,
 	}
 }
@@ -192,14 +192,14 @@ type CompactionPreparation struct {
 
 // TreePreparation holds the computed state before tree navigation.
 type TreePreparation struct {
-	TargetID           string
-	OldLeafID          *string
-	CommonAncestorID   *string
-	EntriesToSummarize []SessionTreeEntry
-	UserWantsSummary   bool
-	CustomInstructions *string
+	TargetID            string
+	OldLeafID           *string
+	CommonAncestorID    *string
+	EntriesToSummarize  []SessionTreeEntry
+	UserWantsSummary    bool
+	CustomInstructions  *string
 	ReplaceInstructions *bool
-	Label              *string
+	Label               *string
 }
 
 // BranchSummaryResult holds the output of a branch summary generation.

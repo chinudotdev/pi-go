@@ -21,10 +21,10 @@ func main() {
 	customPrompt := "You are a helpful coding assistant. Be concise and provide code examples."
 
 	loader := resources.NewLoader(resources.LoaderOptions{
-		CWD:               ".",
-		NoSkills:          true,
-		NoContextFiles:    true,
-		NoPrompts:         true,
+		CWD:                ".",
+		NoSkills:           true,
+		NoContextFiles:     true,
+		NoPrompts:          true,
 		SystemPromptSource: &customPrompt,
 	})
 

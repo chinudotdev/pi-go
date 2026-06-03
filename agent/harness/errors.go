@@ -15,14 +15,14 @@ const (
 type FileErrorCode string
 
 const (
-	FileErrorAborted         FileErrorCode = "aborted"
-	FileErrorNotFound        FileErrorCode = "not_found"
+	FileErrorAborted          FileErrorCode = "aborted"
+	FileErrorNotFound         FileErrorCode = "not_found"
 	FileErrorPermissionDenied FileErrorCode = "permission_denied"
-	FileErrorNotDirectory    FileErrorCode = "not_directory"
-	FileErrorIsDirectory     FileErrorCode = "is_directory"
-	FileErrorInvalid         FileErrorCode = "invalid"
-	FileErrorNotSupported    FileErrorCode = "not_supported"
-	FileErrorUnknown         FileErrorCode = "unknown"
+	FileErrorNotDirectory     FileErrorCode = "not_directory"
+	FileErrorIsDirectory      FileErrorCode = "is_directory"
+	FileErrorInvalid          FileErrorCode = "invalid"
+	FileErrorNotSupported     FileErrorCode = "not_supported"
+	FileErrorUnknown          FileErrorCode = "unknown"
 )
 
 // FileError is returned by FileSystem operations.
@@ -50,12 +50,12 @@ func NewFileError(code FileErrorCode, message string, path string, cause error) 
 type ExecutionErrorCode string
 
 const (
-	ExecErrorAborted        ExecutionErrorCode = "aborted"
-	ExecErrorTimeout        ExecutionErrorCode = "timeout"
+	ExecErrorAborted          ExecutionErrorCode = "aborted"
+	ExecErrorTimeout          ExecutionErrorCode = "timeout"
 	ExecErrorShellUnavailable ExecutionErrorCode = "shell_unavailable"
-	ExecErrorSpawn          ExecutionErrorCode = "spawn_error"
-	ExecErrorCallback       ExecutionErrorCode = "callback_error"
-	ExecErrorUnknown        ExecutionErrorCode = "unknown"
+	ExecErrorSpawn            ExecutionErrorCode = "spawn_error"
+	ExecErrorCallback         ExecutionErrorCode = "callback_error"
+	ExecErrorUnknown          ExecutionErrorCode = "unknown"
 )
 
 // ExecutionError is returned by Shell.Exec.
@@ -79,10 +79,10 @@ func NewExecutionError(code ExecutionErrorCode, message string, cause error) *Ex
 type CompactionErrorCode string
 
 const (
-	CompactionErrorAborted           CompactionErrorCode = "aborted"
+	CompactionErrorAborted             CompactionErrorCode = "aborted"
 	CompactionErrorSummarizationFailed CompactionErrorCode = "summarization_failed"
-	CompactionErrorInvalidSession    CompactionErrorCode = "invalid_session"
-	CompactionErrorUnknown           CompactionErrorCode = "unknown"
+	CompactionErrorInvalidSession      CompactionErrorCode = "invalid_session"
+	CompactionErrorUnknown             CompactionErrorCode = "unknown"
 )
 
 // CompactionError is returned by compaction helpers.
@@ -106,9 +106,9 @@ func NewCompactionError(code CompactionErrorCode, message string, cause error) *
 type BranchSummaryErrorCode string
 
 const (
-	BranchSummaryErrorAborted           BranchSummaryErrorCode = "aborted"
+	BranchSummaryErrorAborted             BranchSummaryErrorCode = "aborted"
 	BranchSummaryErrorSummarizationFailed BranchSummaryErrorCode = "summarization_failed"
-	BranchSummaryErrorInvalidSession    BranchSummaryErrorCode = "invalid_session"
+	BranchSummaryErrorInvalidSession      BranchSummaryErrorCode = "invalid_session"
 )
 
 // BranchSummaryError is returned by branch summarization helpers.

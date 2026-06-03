@@ -92,8 +92,8 @@ type CreateSessionOptions struct {
 	ThinkingLevel string // "off", "minimal", "low", "medium", "high"
 
 	// Tool configuration
-	NoTools     bool     // Disable all tools
-	ToolList    []string // Allowlist (nil = use defaults)
+	NoTools      bool     // Disable all tools
+	ToolList     []string // Allowlist (nil = use defaults)
 	ExcludeTools []string // Denylist
 
 	// Resource overrides (skip auto-discovery when provided)
@@ -128,14 +128,14 @@ type AgentSession struct {
 	settingsMgr *settings.Manager
 	resLoader   *resources.Loader
 
-	mu              sync.Mutex
-	cwd             string
-	agentDir        string
-	model           *ai.Model
-	thinkingLevel   string
+	mu               sync.Mutex
+	cwd              string
+	agentDir         string
+	model            *ai.Model
+	thinkingLevel    string
 	baseSystemPrompt string
 
-	listeners   []SessionEventListener
+	listeners    []SessionEventListener
 	scopedModels []scopedModelEntry
 }
 
@@ -247,14 +247,14 @@ func CreateSession(ctx context.Context, opts CreateSessionOptions) (*CreateSessi
 
 	// Build harness options
 	harnessOpts := harness.HarnessOptions{
-		Env:           localFs,
-		Model:         model,
-		ThinkingLevel: thinkingLevel,
-		SystemPrompt:  sysPrompt,
-		Tools:         toolConfigs.Tools,
+		Env:             localFs,
+		Model:           model,
+		ThinkingLevel:   thinkingLevel,
+		SystemPrompt:    sysPrompt,
+		Tools:           toolConfigs.Tools,
 		ActiveToolNames: toolConfigs.ActiveNames,
-		SteeringMode:  agent.QueueAll,
-		FollowUpMode:  agent.QueueAll,
+		SteeringMode:    agent.QueueAll,
+		FollowUpMode:    agent.QueueAll,
 		GetApiKeyAndHeaders: func(m *ai.Model) (*harness.AuthInfo, error) {
 			return resolveAuth(modelReg, m)
 		},
@@ -773,13 +773,13 @@ func buildSystemPromptFromResources(cwd string, loadedRes *resources.LoadedResou
 	}
 
 	return prompt.BuildSystemPrompt(prompt.BuildSystemPromptOptions{
-		CWD:               cwd,
-		CustomPrompt:      customPrompt,
-		SelectedTools:     toolRes.ActiveNames,
-		ToolSnippets:      snippets,
+		CWD:                cwd,
+		CustomPrompt:       customPrompt,
+		SelectedTools:      toolRes.ActiveNames,
+		ToolSnippets:       snippets,
 		AppendSystemPrompt: appendText,
-		ContextFiles:      loadedRes.ContextFiles,
-		Skills:            loadedRes.Skills,
+		ContextFiles:       loadedRes.ContextFiles,
+		Skills:             loadedRes.Skills,
 	})
 }
 

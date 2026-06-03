@@ -84,8 +84,8 @@ func TestEstimateContextTokens_WithUsage(t *testing.T) {
 	messages := []ai.Message{
 		{Role: "user", Content: "hello"},
 		{
-			Role:    "assistant",
-			Usage:   ai.Usage{TotalTokens: 100},
+			Role:             "assistant",
+			Usage:            ai.Usage{TotalTokens: 100},
 			AssistantContent: []ai.ContentBlock{{Type: "text", Text: "hi"}},
 		},
 		{Role: "user", Content: "follow up"},
@@ -128,8 +128,8 @@ func TestShouldCompact(t *testing.T) {
 
 func TestCalculateContextTokens(t *testing.T) {
 	tests := []struct {
-		usage   ai.Usage
-		expect  int
+		usage  ai.Usage
+		expect int
 	}{
 		{ai.Usage{TotalTokens: 100}, 100},
 		{ai.Usage{Input: 50, Output: 30, CacheRead: 10, CacheWrite: 10}, 100},
@@ -160,18 +160,18 @@ func TestExtractFileOpsFromMessage(t *testing.T) {
 		Role: "assistant",
 		AssistantContent: []ai.ContentBlock{
 			{
-				Type:            "toolCall",
-				ToolCallName:    "read",
+				Type:              "toolCall",
+				ToolCallName:      "read",
 				ToolCallArguments: map[string]any{"path": "/tmp/a.txt"},
 			},
 			{
-				Type:            "toolCall",
-				ToolCallName:    "write",
+				Type:              "toolCall",
+				ToolCallName:      "write",
 				ToolCallArguments: map[string]any{"path": "/tmp/b.txt"},
 			},
 			{
-				Type:            "toolCall",
-				ToolCallName:    "edit",
+				Type:              "toolCall",
+				ToolCallName:      "edit",
 				ToolCallArguments: map[string]any{"path": "/tmp/c.txt"},
 			},
 		},
@@ -349,7 +349,7 @@ func TestGetLastAssistantUsage(t *testing.T) {
 		{SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "message", ID: "1"}, Message: &ai.Message{Role: "user", Content: "hi"}},
 		{
 			SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "message", ID: "2"},
-			Message: &ai.Message{Role: "assistant", Usage: ai.Usage{TotalTokens: 42}, AssistantContent: []ai.ContentBlock{{Type: "text", Text: "hello"}}},
+			Message:              &ai.Message{Role: "assistant", Usage: ai.Usage{TotalTokens: 42}, AssistantContent: []ai.ContentBlock{{Type: "text", Text: "hello"}}},
 		},
 	}
 	usage := GetLastAssistantUsage(entries)
@@ -362,7 +362,7 @@ func TestGetLastAssistantUsage_Aborted(t *testing.T) {
 	entries := []harness.SessionTreeEntry{
 		{
 			SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "message", ID: "1"},
-			Message: &ai.Message{Role: "assistant", StopReason: "aborted", Usage: ai.Usage{TotalTokens: 99}},
+			Message:              &ai.Message{Role: "assistant", StopReason: "aborted", Usage: ai.Usage{TotalTokens: 99}},
 		},
 	}
 	usage := GetLastAssistantUsage(entries)
@@ -389,7 +389,7 @@ func TestGetModel_FromAssistant(t *testing.T) {
 	entries := []harness.SessionTreeEntry{
 		{
 			SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "message", ID: "1"},
-			Message: &ai.Message{Role: "assistant", Provider: "anthropic", Model: "claude-3", AssistantContent: []ai.ContentBlock{{Type: "text", Text: "hi"}}},
+			Message:              &ai.Message{Role: "assistant", Provider: "anthropic", Model: "claude-3", AssistantContent: []ai.ContentBlock{{Type: "text", Text: "hi"}}},
 		},
 	}
 	model := GetModel(entries)

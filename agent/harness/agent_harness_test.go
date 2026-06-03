@@ -13,10 +13,10 @@ import (
 
 // mockSession implements SessionProvider for testing.
 type mockSession struct {
-	metadata   SessionMetadata
-	leafID     *string
-	entries    []SessionTreeEntry
-	labels     map[string]string
+	metadata SessionMetadata
+	leafID   *string
+	entries  []SessionTreeEntry
+	labels   map[string]string
 }
 
 func newMockSession() *mockSession {
@@ -157,8 +157,8 @@ func TestNewAgentHarness_WithTools(t *testing.T) {
 	model := &ai.Model{ID: "test", Provider: "faux", API: "faux"}
 
 	opts := HarnessOptions{
-		Model:          model,
-		Tools:          []agent.Tool{tool1, tool2},
+		Model:           model,
+		Tools:           []agent.Tool{tool1, tool2},
 		ActiveToolNames: []string{"read_file"},
 	}
 	h := NewAgentHarness(opts, sess)

@@ -43,8 +43,8 @@ func parseProxyRequest(r *http.Request) (model *ai.Model, convCtx *ai.Context, e
 
 	var body struct {
 		Model   *ai.Model   `json:"model"`
-		Context *ai.Context  `json:"context"`
-		Options any          `json:"options"`
+		Context *ai.Context `json:"context"`
+		Options any         `json:"options"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 		return nil, nil, err

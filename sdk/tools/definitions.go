@@ -121,7 +121,7 @@ var ToolSchemas = map[ToolName]map[string]any{
 		"properties": map[string]any{
 			"path": map[string]any{"type": "string", "description": "Path to the file to edit (relative or absolute)"},
 			"edits": map[string]any{
-				"type": "array",
+				"type":        "array",
 				"description": "One or more targeted replacements. Each edit is matched against the original file, not incrementally.",
 				"items": map[string]any{
 					"type": "object",

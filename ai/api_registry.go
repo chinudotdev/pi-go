@@ -25,7 +25,7 @@ type apiProviderEntry struct {
 
 // apiRegistry manages registered API providers.
 type apiRegistry struct {
-	mu       sync.RWMutex
+	mu        sync.RWMutex
 	providers map[Api]apiProviderEntry
 }
 

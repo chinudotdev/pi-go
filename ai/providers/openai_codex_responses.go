@@ -60,4 +60,3 @@ func StreamSimpleOpenAICodexResponses(ctx context.Context, model *ai.Model, conv
 	baseOpts := ai.BuildBaseOptions(model, nil, apiKey)
 	return StreamOpenAICodexResponses(ctx, model, convCtx, &baseOpts)
 }
-

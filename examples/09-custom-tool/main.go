@@ -48,10 +48,10 @@ func main() {
 	customPrompt := "You are a time assistant. Use the get_current_time tool when asked about time."
 
 	loader := resources.NewLoader(resources.LoaderOptions{
-		CWD:               ".",
-		NoSkills:          true,
-		NoContextFiles:    true,
-		NoPrompts:         true,
+		CWD:                ".",
+		NoSkills:           true,
+		NoContextFiles:     true,
+		NoPrompts:          true,
 		SystemPromptSource: &customPrompt,
 	})
 

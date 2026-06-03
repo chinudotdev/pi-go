@@ -117,9 +117,9 @@ func TestLoadSkills_WithExplicitPaths(t *testing.T) {
 	writeSkill(t, explicitDir, "explicit-skill", "An explicit skill")
 
 	result := LoadSkills(LoadSkillsOptions{
-		CWD:         cwd,
-		AgentDir:    agentDir,
-		SkillPaths:  []string{filepath.Join(explicitDir, "explicit-skill")},
+		CWD:        cwd,
+		AgentDir:   agentDir,
+		SkillPaths: []string{filepath.Join(explicitDir, "explicit-skill")},
 	})
 
 	if len(result.Skills) != 1 {
@@ -202,17 +202,17 @@ func TestFormatSkillsForPrompt_Empty(t *testing.T) {
 
 func TestValidateName(t *testing.T) {
 	tests := []struct {
-		name    string
-		valid   bool
-		errCnt  int
+		name   string
+		valid  bool
+		errCnt int
 	}{
 		{"my-skill", true, 0},
 		{"skill123", true, 0},
-		{"My-Skill", false, 1}, // uppercase
-		{"-skill", false, 1},   // starts with hyphen
-		{"skill-", false, 1},   // ends with hyphen
+		{"My-Skill", false, 1},  // uppercase
+		{"-skill", false, 1},    // starts with hyphen
+		{"skill-", false, 1},    // ends with hyphen
 		{"my--skill", false, 1}, // double hyphen
-		{"my_skill", false, 1}, // underscore
+		{"my_skill", false, 1},  // underscore
 	}
 	for _, tc := range tests {
 		errs := validateName(tc.name)

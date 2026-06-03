@@ -51,7 +51,7 @@ func TestValidateToolArguments_NilArgs(t *testing.T) {
 	tool := &Tool{
 		Name:        "test",
 		Description: "test tool",
-		Parameters: map[string]any{"type": "object"},
+		Parameters:  map[string]any{"type": "object"},
 	}
 	result, err := ValidateToolArguments(tool, nil)
 	if err != nil {
@@ -307,7 +307,7 @@ func TestValidateToolArguments_ArrayCoercion(t *testing.T) {
 			"type": "object",
 			"properties": map[string]any{
 				"items": map[string]any{
-					"type": "array",
+					"type":  "array",
 					"items": map[string]any{"type": "number"},
 				},
 			},
@@ -518,8 +518,8 @@ func TestValidateToolArguments_AdditionalPropertiesSchema(t *testing.T) {
 		Name:        "test",
 		Description: "test",
 		Parameters: map[string]any{
-			"type":       "object",
-			"properties": map[string]any{"name": map[string]any{"type": "string"}},
+			"type":                 "object",
+			"properties":           map[string]any{"name": map[string]any{"type": "string"}},
 			"additionalProperties": map[string]any{"type": "number"},
 		},
 	}
@@ -545,8 +545,8 @@ func TestValidateToolArguments_ArrayMinItems(t *testing.T) {
 			"type": "object",
 			"properties": map[string]any{
 				"items": map[string]any{
-					"type":      "array",
-					"minItems":  float64(2),
+					"type":     "array",
+					"minItems": float64(2),
 				},
 			},
 		},
@@ -566,8 +566,8 @@ func TestValidateToolArguments_ArrayMaxItems(t *testing.T) {
 			"type": "object",
 			"properties": map[string]any{
 				"items": map[string]any{
-					"type":      "array",
-					"maxItems":  float64(2),
+					"type":     "array",
+					"maxItems": float64(2),
 				},
 			},
 		},
@@ -647,7 +647,7 @@ func TestValidateToolArguments_NumberMinMax(t *testing.T) {
 func TestValidateToolCall_ToolNotFound(t *testing.T) {
 	tools := []*Tool{{Name: "existing", Description: "test"}}
 	_, err := ValidateToolCall(tools, ai.ContentBlock{
-		ToolCallName: "missing",
+		ToolCallName:      "missing",
 		ToolCallArguments: map[string]any{},
 	})
 	if err == nil {

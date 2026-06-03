@@ -12,12 +12,12 @@ import (
 
 // jsonlSessionHeader is the first line of a JSONL session file.
 type jsonlSessionHeader struct {
-	Type           string  `json:"type"`
-	Version        int     `json:"version"`
-	ID             string  `json:"id"`
-	Timestamp      string  `json:"timestamp"`
-	Cwd            string  `json:"cwd"`
-	ParentSession  *string `json:"parentSession,omitempty"`
+	Type          string  `json:"type"`
+	Version       int     `json:"version"`
+	ID            string  `json:"id"`
+	Timestamp     string  `json:"timestamp"`
+	Cwd           string  `json:"cwd"`
+	ParentSession *string `json:"parentSession,omitempty"`
 }
 
 // JsonlFileSystem is the subset of harness.FileSystem needed by JSONL storage.
@@ -42,14 +42,14 @@ type JsonlRepoFileSystem interface {
 
 // JsonlSessionStorage implements SessionStorage backed by a JSONL file.
 type JsonlSessionStorage struct {
-	mu       sync.Mutex
-	fs       JsonlFileSystem
-	filePath string
-	metadata harness.JsonlSessionMetadata
-	entries  []harness.SessionTreeEntry
+	mu         sync.Mutex
+	fs         JsonlFileSystem
+	filePath   string
+	metadata   harness.JsonlSessionMetadata
+	entries    []harness.SessionTreeEntry
 	byID       map[string]*harness.SessionTreeEntry
 	labelsByID map[string]string
-	leafID   *string
+	leafID     *string
 }
 
 // NewJsonlSessionStorage creates (creates the file) or opens an existing JSONL session.
@@ -66,8 +66,8 @@ func newJsonlSessionStorage(
 			ID:        header.ID,
 			CreatedAt: header.Timestamp,
 		},
-		Cwd:              header.Cwd,
-		Path:             filePath,
+		Cwd:               header.Cwd,
+		Path:              filePath,
 		ParentSessionPath: header.ParentSession,
 	}
 
@@ -168,8 +168,8 @@ func LoadJsonlSessionMetadata(ctx context.Context, fs JsonlFileSystem, filePath 
 			ID:        header.ID,
 			CreatedAt: header.Timestamp,
 		},
-		Cwd:              header.Cwd,
-		Path:             filePath,
+		Cwd:               header.Cwd,
+		Path:              filePath,
 		ParentSessionPath: header.ParentSession,
 	}, nil
 }

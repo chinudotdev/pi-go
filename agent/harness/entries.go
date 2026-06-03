@@ -38,11 +38,11 @@ type ActiveToolsChangeEntry struct {
 // CompactionEntry records a compaction with its summary.
 type CompactionEntry struct {
 	SessionTreeEntryBase
-	Summary         string `json:"summary"`
+	Summary          string `json:"summary"`
 	FirstKeptEntryID string `json:"firstKeptEntryId"`
-	TokensBefore    int    `json:"tokensBefore"`
-	Details         any    `json:"details,omitempty"`
-	FromHook        bool   `json:"fromHook,omitempty"`
+	TokensBefore     int    `json:"tokensBefore"`
+	Details          any    `json:"details,omitempty"`
+	FromHook         bool   `json:"fromHook,omitempty"`
 }
 
 // BranchSummaryEntry records a branch summary.
@@ -64,10 +64,10 @@ type CustomEntry struct {
 // CustomMessageEntry records a custom message in the session tree.
 type CustomMessageEntry struct {
 	SessionTreeEntryBase
-	CustomType string                    `json:"customType"`
-	Content    any                       `json:"content"` // string or []ContentBlock
-	Display    bool                      `json:"display"`
-	Details    any                       `json:"details,omitempty"`
+	CustomType string `json:"customType"`
+	Content    any    `json:"content"` // string or []ContentBlock
+	Display    bool   `json:"display"`
+	Details    any    `json:"details,omitempty"`
 }
 
 // LabelEntry records a label applied to an entry.
@@ -150,8 +150,8 @@ type SessionMetadata struct {
 // JsonlSessionMetadata extends SessionMetadata with JSONL-specific fields.
 type JsonlSessionMetadata struct {
 	SessionMetadata
-	Cwd              string  `json:"cwd"`
-	Path             string  `json:"path"`
+	Cwd               string  `json:"cwd"`
+	Path              string  `json:"path"`
 	ParentSessionPath *string `json:"parentSessionPath,omitempty"`
 }
 

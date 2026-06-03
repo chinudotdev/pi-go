@@ -14,8 +14,8 @@ import (
 const (
 	CompactionSummaryPrefix = "The conversation history before this point was compacted into the following summary:\n\n<summary>\n"
 	CompactionSummarySuffix = "\n</summary>"
-	BranchSummaryPrefix    = "The following is a summary of a branch that this conversation came back from:\n\n<summary>\n"
-	BranchSummarySuffix    = "</summary>"
+	BranchSummaryPrefix     = "The following is a summary of a branch that this conversation came back from:\n\n<summary>\n"
+	BranchSummarySuffix     = "</summary>"
 )
 
 // Custom role types for coding-agent messages.

@@ -16,8 +16,8 @@ func TestClampThinkingLevel_ExactMatch(t *testing.T) {
 	model := &Model{
 		Reasoning: true,
 		ThinkingLevelMap: ThinkingLevelMap{
-			ThinkingOff:  strPtr("off"),
-			ThinkingMLow: strPtr("low"),
+			ThinkingOff:   strPtr("off"),
+			ThinkingMLow:  strPtr("low"),
 			ThinkingMHigh: strPtr("high"),
 		},
 	}
@@ -33,7 +33,7 @@ func TestClampThinkingLevel_MissingLevelStillAvailable(t *testing.T) {
 	model := &Model{
 		Reasoning: true,
 		ThinkingLevelMap: ThinkingLevelMap{
-			ThinkingOff:  strPtr("off"),
+			ThinkingOff:   strPtr("off"),
 			ThinkingMHigh: strPtr("high"),
 		},
 	}
@@ -48,11 +48,11 @@ func TestClampThinkingLevel_ClampsDown(t *testing.T) {
 	model := &Model{
 		Reasoning: true,
 		ThinkingLevelMap: ThinkingLevelMap{
-			ThinkingOff:  strPtr("off"),
-			ThinkingMLow: strPtr("low"),
+			ThinkingOff:     strPtr("off"),
+			ThinkingMLow:    strPtr("low"),
 			ThinkingMMedium: nil, // explicitly unsupported
-			ThinkingMHigh:  nil, // explicitly unsupported
-			ThinkingMXHigh: nil, // explicitly unsupported
+			ThinkingMHigh:   nil, // explicitly unsupported
+			ThinkingMXHigh:  nil, // explicitly unsupported
 		},
 	}
 	// "high" is explicitly nil; should clamp down to "low"
@@ -81,7 +81,7 @@ func TestClampThinkingLevel_XHighNotAvailable(t *testing.T) {
 	model := &Model{
 		Reasoning: true,
 		ThinkingLevelMap: ThinkingLevelMap{
-			ThinkingOff:  strPtr("off"),
+			ThinkingOff:   strPtr("off"),
 			ThinkingMHigh: strPtr("high"),
 		},
 	}

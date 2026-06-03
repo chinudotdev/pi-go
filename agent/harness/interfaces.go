@@ -13,9 +13,9 @@ type FileInfo struct {
 
 // ExecOptions controls shell command execution.
 type ExecOptions struct {
-	Cwd     string
-	Env     map[string]string
-	Timeout int // seconds
+	Cwd      string
+	Env      map[string]string
+	Timeout  int // seconds
 	OnStdout func(chunk string)
 	OnStderr func(chunk string)
 }

@@ -195,7 +195,7 @@ func TestE2E_AbortDuringStreaming(t *testing.T) {
 func TestE2E_LifecycleEventsDuringStreaming(t *testing.T) {
 	agent := New(Options{
 		InitialState: &InitialState{Model: testModel()},
-		StreamFn:    fauxStreamFn("response"),
+		StreamFn:     fauxStreamFn("response"),
 	})
 
 	var events []Event
@@ -252,7 +252,7 @@ func TestE2E_MultiTurnContext(t *testing.T) {
 
 	agent := New(Options{
 		InitialState: &InitialState{Model: testModel()},
-		StreamFn:    streamFn,
+		StreamFn:     streamFn,
 	})
 
 	// Turn 1
@@ -336,7 +336,7 @@ func TestE2E_ThinkingContentBlocks(t *testing.T) {
 func TestE2E_Continue_ThrowsWhenNoMessages(t *testing.T) {
 	agent := New(Options{
 		InitialState: &InitialState{Model: testModel()},
-		StreamFn:    fauxStreamFn("ok"),
+		StreamFn:     fauxStreamFn("ok"),
 	})
 
 	err := agent.Continue(context.Background())

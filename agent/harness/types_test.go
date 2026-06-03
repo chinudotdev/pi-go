@@ -144,7 +144,7 @@ func TestToError(t *testing.T) {
 
 func TestHarnessStreamOptions_Clone(t *testing.T) {
 	orig := HarnessStreamOptions{
-		Headers: map[string]string{"a": "1", "b": "2"},
+		Headers:  map[string]string{"a": "1", "b": "2"},
 		Metadata: map[string]any{"key": "val"},
 	}
 	clone := orig.Clone()

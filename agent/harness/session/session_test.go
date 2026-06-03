@@ -56,8 +56,8 @@ func TestInMemoryStorage_AppendAndGetEntry(t *testing.T) {
 	msg := ai.NewUserMessage("hello")
 	err = storage.AppendEntry(ctx, harness.SessionTreeEntry{
 		SessionTreeEntryBase: harness.SessionTreeEntryBase{
-			Type: "message",
-			ID:   id,
+			Type:      "message",
+			ID:        id,
 			Timestamp: harness.NowISO(),
 		},
 		Message: &msg,
@@ -142,8 +142,8 @@ func TestInMemoryStorage_FindEntries(t *testing.T) {
 	id4, _ := storage.CreateEntryID(ctx)
 	storage.AppendEntry(ctx, harness.SessionTreeEntry{
 		SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "model_change", ID: id4, Timestamp: harness.NowISO()},
-		Provider: "test",
-		ModelID:  "gpt-4",
+		Provider:             "test",
+		ModelID:              "gpt-4",
 	})
 
 	messages, err := storage.FindEntries(ctx, "message")
@@ -523,33 +523,33 @@ func TestBuildSessionContext_Compaction(t *testing.T) {
 	id1, _ := storage.CreateEntryID(ctx)
 	storage.AppendEntry(ctx, harness.SessionTreeEntry{
 		SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "message", ID: id1, Timestamp: harness.NowISO()},
-		Message: &msg1,
+		Message:              &msg1,
 	})
 
 	id2, _ := storage.CreateEntryID(ctx)
 	storage.AppendEntry(ctx, harness.SessionTreeEntry{
 		SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "message", ID: id2, Timestamp: harness.NowISO()},
-		Message: &msg2,
+		Message:              &msg2,
 	})
 
 	id3, _ := storage.CreateEntryID(ctx)
 	storage.AppendEntry(ctx, harness.SessionTreeEntry{
 		SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "message", ID: id3, Timestamp: harness.NowISO()},
-		Message: &msg3,
+		Message:              &msg3,
 	})
 
 	// Compaction: keep from id2 onwards
 	storage.AppendEntry(ctx, harness.SessionTreeEntry{
 		SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "compaction", ID: "comp1", Timestamp: harness.NowISO()},
-		Summary:          "old conversation about...",
-		FirstKeptEntryID: id2,
-		TokensBefore:     1000,
+		Summary:              "old conversation about...",
+		FirstKeptEntryID:     id2,
+		TokensBefore:         1000,
 	})
 
 	id5, _ := storage.CreateEntryID(ctx)
 	storage.AppendEntry(ctx, harness.SessionTreeEntry{
 		SessionTreeEntryBase: harness.SessionTreeEntryBase{Type: "message", ID: id5, Timestamp: harness.NowISO()},
-		Message: &msg4,
+		Message:              &msg4,
 	})
 
 	// Build context from all entries

@@ -27,7 +27,7 @@ type Api = string
 type KnownProvider string
 
 const (
-	ProviderAmazonBedrock       KnownProvider = "amazon-bedrock"
+	ProviderAmazonBedrock        KnownProvider = "amazon-bedrock"
 	ProviderAnthropic            KnownProvider = "anthropic"
 	ProviderGoogle               KnownProvider = "google"
 	ProviderGoogleVertex         KnownProvider = "google-vertex"
@@ -120,19 +120,19 @@ const (
 
 // Model represents a specific LLM model configuration.
 type Model struct {
-	ID               string           `json:"id"`
-	Name             string           `json:"name"`
-	API              Api              `json:"api"`
-	Provider         Provider         `json:"provider"`
-	BaseURL          string           `json:"baseUrl"`
-	Reasoning        bool             `json:"reasoning"`
-	ThinkingLevelMap ThinkingLevelMap `json:"thinkingLevelMap,omitempty"`
-	Input            []string         `json:"input"` // "text", "image"
-	Cost             ModelCost        `json:"cost"`
-	ContextWindow    int              `json:"contextWindow"`
-	MaxTokens        int              `json:"maxTokens"`
+	ID               string            `json:"id"`
+	Name             string            `json:"name"`
+	API              Api               `json:"api"`
+	Provider         Provider          `json:"provider"`
+	BaseURL          string            `json:"baseUrl"`
+	Reasoning        bool              `json:"reasoning"`
+	ThinkingLevelMap ThinkingLevelMap  `json:"thinkingLevelMap,omitempty"`
+	Input            []string          `json:"input"` // "text", "image"
+	Cost             ModelCost         `json:"cost"`
+	ContextWindow    int               `json:"contextWindow"`
+	MaxTokens        int               `json:"maxTokens"`
 	Headers          map[string]string `json:"headers,omitempty"`
-	Compat           any              `json:"compat,omitempty"` // Provider-specific compat struct
+	Compat           any               `json:"compat,omitempty"` // Provider-specific compat struct
 }
 
 // ModelCost represents the per-token cost for a model.
@@ -181,10 +181,10 @@ const (
 // Use the Type field ("text", "thinking", "toolCall") to determine which
 // fields are populated. For type-safe access, use the AsText/AsThinking/AsToolCall methods.
 type ContentBlock struct {
-	Type      string `json:"type"` // "text", "thinking", "toolCall"
+	Type string `json:"type"` // "text", "thinking", "toolCall"
 
 	// Populated when Type == "text"
-	Text         string  `json:"text,omitempty"`
+	Text          string  `json:"text,omitempty"`
 	TextSignature *string `json:"textSignature,omitempty"`
 
 	// Populated when Type == "thinking"
@@ -244,7 +244,7 @@ func NewToolCallContent(id, name string, args map[string]any) ContentBlock {
 
 // UserMessage represents a message from the user.
 type UserMessage struct {
-	Role      string `json:"role"` // always "user"
+	Role      string `json:"role"`    // always "user"
 	Content   any    `json:"content"` // string or []ContentBlock
 	Timestamp int64  `json:"timestamp"`
 }
@@ -267,13 +267,13 @@ type AssistantMessage struct {
 
 // ToolResultMessage represents a tool execution result.
 type ToolResultMessage struct {
-	Role       string        `json:"role"` // always "toolResult"
-	ToolCallID string        `json:"toolCallId"`
-	ToolName   string        `json:"toolName"`
+	Role       string         `json:"role"` // always "toolResult"
+	ToolCallID string         `json:"toolCallId"`
+	ToolName   string         `json:"toolName"`
 	Content    []ContentBlock `json:"content"`
-	Details    any           `json:"details,omitempty"`
-	IsError    bool          `json:"isError"`
-	Timestamp  int64         `json:"timestamp"`
+	Details    any            `json:"details,omitempty"`
+	IsError    bool           `json:"isError"`
+	Timestamp  int64          `json:"timestamp"`
 }
 
 // Diagnostic represents a redacted provider/runtime diagnostic.
@@ -284,18 +284,18 @@ type Diagnostic struct {
 // ToolCall represents a tool invocation in the streaming protocol.
 // For content blocks within messages, use ContentBlock with Type="toolCall" instead.
 type ToolCall struct {
-	Type           string         `json:"type"` // always "toolCall"
-	ID             string         `json:"id"`
-	Name           string         `json:"name"`
-	Arguments      map[string]any `json:"arguments"`
-	ThoughtSignature *string      `json:"thoughtSignature,omitempty"`
+	Type             string         `json:"type"` // always "toolCall"
+	ID               string         `json:"id"`
+	Name             string         `json:"name"`
+	Arguments        map[string]any `json:"arguments"`
+	ThoughtSignature *string        `json:"thoughtSignature,omitempty"`
 }
 
 // Message is a discriminated union of all message types. Use the Role field
 // to determine which fields are valid:
 //   - "user":       Content, Timestamp
 //   - "assistant":  AssistantContent, API, Provider, Model, ResponseModel, ResponseID,
-//                   Diagnostics, Usage, StopReason, ErrorMessage, Timestamp
+//     Diagnostics, Usage, StopReason, ErrorMessage, Timestamp
 //   - "toolResult": ToolCallID, ToolName, ToolResultContent, Details, IsError, Timestamp
 //
 // Use AsUserMessage(), AsAssistantMessage(), AsToolResultMessage() for typed access.
@@ -318,11 +318,11 @@ type Message struct {
 	ErrorMessage     *string        `json:"errorMessage,omitempty"`
 
 	// ToolResult fields (Role == "toolResult")
-	ToolCallID        string `json:"toolCallId,omitempty"`
-	ToolName          string `json:"toolName,omitempty"`
+	ToolCallID        string         `json:"toolCallId,omitempty"`
+	ToolName          string         `json:"toolName,omitempty"`
 	ToolResultContent []ContentBlock `json:"toolResultContent,omitempty"`
-	Details           any    `json:"details,omitempty"`
-	IsError           bool   `json:"isError,omitempty"`
+	Details           any            `json:"details,omitempty"`
+	IsError           bool           `json:"isError,omitempty"`
 
 	Timestamp int64 `json:"timestamp"`
 }
@@ -429,7 +429,7 @@ type Tool struct {
 
 // Context holds the full conversation context for a request.
 type Context struct {
-	SystemPrompt *string  `json:"systemPrompt,omitempty"`
+	SystemPrompt *string   `json:"systemPrompt,omitempty"`
 	Messages     []Message `json:"messages"`
 	Tools        []Tool    `json:"tools,omitempty"`
 }
@@ -478,8 +478,8 @@ type AssistantMessageEvent struct {
 	ToolCall     *ToolCall         `json:"toolCall,omitempty"`
 	Reason       StopReason        `json:"reason,omitempty"`
 	Message      *AssistantMessage `json:"message,omitempty"` // for "done" events
-	Error        *AssistantMessage `json:"error,omitempty"`    // for "error" events
-	Partial      *AssistantMessage `json:"partial,omitempty"`  // for streaming partial updates
+	Error        *AssistantMessage `json:"error,omitempty"`   // for "error" events
+	Partial      *AssistantMessage `json:"partial,omitempty"` // for streaming partial updates
 }
 
 // EventStream is a Go channel-based event stream for assistant messages.
@@ -577,23 +577,23 @@ func (s *EventStream) Iterate() <-chan AssistantMessageEvent {
 
 // OpenAICompletionsCompat configures behavior for OpenAI-compatible completions APIs.
 type OpenAICompletionsCompat struct {
-	SupportsStore                               *bool                `json:"supportsStore,omitempty"`
-	SupportsDeveloperRole                       *bool                `json:"supportsDeveloperRole,omitempty"`
-	SupportsReasoningEffort                     *bool                `json:"supportsReasoningEffort,omitempty"`
-	SupportsUsageInStreaming                    *bool                `json:"supportsUsageInStreaming,omitempty"`
-	MaxTokensField                              *string              `json:"maxTokensField,omitempty"`
-	RequiresToolResultName                      *bool                `json:"requiresToolResultName,omitempty"`
-	RequiresAssistantAfterToolResult            *bool                `json:"requiresAssistantAfterToolResult,omitempty"`
-	RequiresThinkingAsText                      *bool                `json:"requiresThinkingAsText,omitempty"`
-	RequiresReasoningContentOnAssistantMessages *bool                `json:"requiresReasoningContentOnAssistantMessages,omitempty"`
-	ThinkingFormat                              *string              `json:"thinkingFormat,omitempty"`
-	OpenRouterRouting                           *OpenRouterRouting   `json:"openRouterRouting,omitempty"`
+	SupportsStore                               *bool                 `json:"supportsStore,omitempty"`
+	SupportsDeveloperRole                       *bool                 `json:"supportsDeveloperRole,omitempty"`
+	SupportsReasoningEffort                     *bool                 `json:"supportsReasoningEffort,omitempty"`
+	SupportsUsageInStreaming                    *bool                 `json:"supportsUsageInStreaming,omitempty"`
+	MaxTokensField                              *string               `json:"maxTokensField,omitempty"`
+	RequiresToolResultName                      *bool                 `json:"requiresToolResultName,omitempty"`
+	RequiresAssistantAfterToolResult            *bool                 `json:"requiresAssistantAfterToolResult,omitempty"`
+	RequiresThinkingAsText                      *bool                 `json:"requiresThinkingAsText,omitempty"`
+	RequiresReasoningContentOnAssistantMessages *bool                 `json:"requiresReasoningContentOnAssistantMessages,omitempty"`
+	ThinkingFormat                              *string               `json:"thinkingFormat,omitempty"`
+	OpenRouterRouting                           *OpenRouterRouting    `json:"openRouterRouting,omitempty"`
 	VercelGatewayRouting                        *VercelGatewayRouting `json:"vercelGatewayRouting,omitempty"`
-	ZAIToolStream                               *bool                `json:"zaiToolStream,omitempty"`
-	SupportsStrictMode                          *bool                `json:"supportsStrictMode,omitempty"`
-	CacheControlFormat                          *string              `json:"cacheControlFormat,omitempty"`
-	SendSessionAffinityHeaders                  *bool                `json:"sendSessionAffinityHeaders,omitempty"`
-	SupportsLongCacheRetention                  *bool                `json:"supportsLongCacheRetention,omitempty"`
+	ZAIToolStream                               *bool                 `json:"zaiToolStream,omitempty"`
+	SupportsStrictMode                          *bool                 `json:"supportsStrictMode,omitempty"`
+	CacheControlFormat                          *string               `json:"cacheControlFormat,omitempty"`
+	SendSessionAffinityHeaders                  *bool                 `json:"sendSessionAffinityHeaders,omitempty"`
+	SupportsLongCacheRetention                  *bool                 `json:"supportsLongCacheRetention,omitempty"`
 }
 
 // OpenAIResponsesCompat configures behavior for OpenAI Responses-compatible APIs.
@@ -604,13 +604,13 @@ type OpenAIResponsesCompat struct {
 
 // AnthropicMessagesCompat configures behavior for Anthropic Messages-compatible APIs.
 type AnthropicMessagesCompat struct {
-	SupportsEagerToolInputStreaming *bool  `json:"supportsEagerToolInputStreaming,omitempty"`
-	SupportsLongCacheRetention      *bool  `json:"supportsLongCacheRetention,omitempty"`
-	SendSessionAffinityHeaders      *bool  `json:"sendSessionAffinityHeaders,omitempty"`
-	SupportsCacheControlOnTools     *bool  `json:"supportsCacheControlOnTools,omitempty"`
-	SupportsTemperature             *bool  `json:"supportsTemperature,omitempty"`
-	ForceAdaptiveThinking           *bool  `json:"forceAdaptiveThinking,omitempty"`
-	AllowEmptySignature             *bool  `json:"allowEmptySignature,omitempty"`
+	SupportsEagerToolInputStreaming *bool `json:"supportsEagerToolInputStreaming,omitempty"`
+	SupportsLongCacheRetention      *bool `json:"supportsLongCacheRetention,omitempty"`
+	SendSessionAffinityHeaders      *bool `json:"sendSessionAffinityHeaders,omitempty"`
+	SupportsCacheControlOnTools     *bool `json:"supportsCacheControlOnTools,omitempty"`
+	SupportsTemperature             *bool `json:"supportsTemperature,omitempty"`
+	ForceAdaptiveThinking           *bool `json:"forceAdaptiveThinking,omitempty"`
+	AllowEmptySignature             *bool `json:"allowEmptySignature,omitempty"`
 }
 
 // OpenRouterRouting controls OpenRouter upstream provider selection.

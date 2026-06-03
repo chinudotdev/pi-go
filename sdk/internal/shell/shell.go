@@ -30,16 +30,16 @@ func GetConfig(customShellPath string) (Config, error) {
 
 	// Prefer /bin/bash
 	if _, err := os.Stat("/bin/bash"); err == nil {
-		return Config{Shell: "/bin/bash", Args: []string{"-c"},}, nil
+		return Config{Shell: "/bin/bash", Args: []string{"-c"}}, nil
 	}
 
 	// Try bash on PATH
 	if path, err := exec.LookPath("bash"); err == nil {
-		return Config{Shell: path, Args: []string{"-c"},}, nil
+		return Config{Shell: path, Args: []string{"-c"}}, nil
 	}
 
 	// Fallback to sh
-	return Config{Shell: "/bin/sh", Args: []string{"-c"},}, nil
+	return Config{Shell: "/bin/sh", Args: []string{"-c"}}, nil
 }
 
 // Detect detects the user's shell from the SHELL environment variable.

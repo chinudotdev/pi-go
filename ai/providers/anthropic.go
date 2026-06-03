@@ -25,9 +25,9 @@ import (
 // AnthropicOptions extends StreamOptions with Anthropic-specific parameters.
 type AnthropicOptions struct {
 	ai.StreamOptions
-	ToolChoice    any  `json:"toolChoice,omitempty"`    // "auto" | "none" | "required" | {type:"tool",name:"..."}
+	ToolChoice               any    `json:"toolChoice,omitempty"`      // "auto" | "none" | "required" | {type:"tool",name:"..."}
 	AnthropicThinkingDisplay string `json:"thinkingDisplay,omitempty"` // "summarized" | "omitted"
-	InterleavedThinking bool `json:"interleavedThinking,omitempty"`
+	InterleavedThinking      bool   `json:"interleavedThinking,omitempty"`
 }
 
 // StreamAnthropic streams responses from the Anthropic Messages API.
@@ -59,9 +59,9 @@ func StreamAnthropic(ctx context.Context, model *ai.Model, convCtx *ai.Context, 
 		output.StopReason = ai.StopReasonError
 		output.ErrorMessage = &errMsg
 		stream.Push(ai.AssistantMessageEvent{
-			Type:  "error",
+			Type:   "error",
 			Reason: ai.StopReasonError,
-			Error: &output,
+			Error:  &output,
 		})
 		stream.End(output)
 	}()
@@ -78,4 +78,3 @@ func StreamSimpleAnthropic(ctx context.Context, model *ai.Model, convCtx *ai.Con
 	baseOpts := ai.BuildBaseOptions(model, nil, apiKey)
 	return StreamAnthropic(ctx, model, convCtx, &baseOpts)
 }
-

@@ -5,7 +5,10 @@ import (
 )
 
 func TestFormatSize(t *testing.T) {
-	tests := []struct{ bytes int; expected string }{
+	tests := []struct {
+		bytes    int
+		expected string
+	}{
 		{500, "500B"},
 		{1024, "1.0KB"},
 		{1536, "1.5KB"},

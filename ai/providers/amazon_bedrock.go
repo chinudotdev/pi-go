@@ -31,14 +31,14 @@ import (
 // BedrockOptions extends StreamOptions with Bedrock-specific parameters.
 type BedrockOptions struct {
 	ai.StreamOptions
-	Region             string `json:"region,omitempty"`
-	Profile            string `json:"profile,omitempty"`
-	ToolChoice         any    `json:"toolChoice,omitempty"`
-	Reasoning          ai.ThinkingLevel `json:"reasoning,omitempty"`
-	ThinkingBudgets    *ai.ThinkingBudgets `json:"thinkingBudgets,omitempty"`
-	InterleavedThinking bool  `json:"interleavedThinking,omitempty"`
-	ThinkingDisplay    string `json:"thinkingDisplay,omitempty"` // "summarized" | "omitted"
-	RequestMetadata    map[string]string `json:"requestMetadata,omitempty"`
+	Region              string              `json:"region,omitempty"`
+	Profile             string              `json:"profile,omitempty"`
+	ToolChoice          any                 `json:"toolChoice,omitempty"`
+	Reasoning           ai.ThinkingLevel    `json:"reasoning,omitempty"`
+	ThinkingBudgets     *ai.ThinkingBudgets `json:"thinkingBudgets,omitempty"`
+	InterleavedThinking bool                `json:"interleavedThinking,omitempty"`
+	ThinkingDisplay     string              `json:"thinkingDisplay,omitempty"` // "summarized" | "omitted"
+	RequestMetadata     map[string]string   `json:"requestMetadata,omitempty"`
 }
 
 // StreamBedrock streams from Amazon Bedrock ConverseStream.
@@ -93,4 +93,3 @@ func StreamSimpleBedrock(ctx context.Context, model *ai.Model, convCtx *ai.Conte
 	baseOpts := ai.BuildBaseOptions(model, nil, apiKey)
 	return StreamBedrock(ctx, model, convCtx, &baseOpts)
 }
-

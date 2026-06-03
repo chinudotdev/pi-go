@@ -346,8 +346,8 @@ func BuildSessionContext(pathEntries []harness.SessionTreeEntry) *harness.Sessio
 				prefix := "The following is a summary of a branch that this conversation came back from:\n\n<summary>\n"
 				suffix := "\n</summary>"
 				messages = append(messages, ai.Message{
-					Role:    "user",
-					Content: prefix + entry.Summary + suffix,
+					Role:      "user",
+					Content:   prefix + entry.Summary + suffix,
 					Timestamp: timestampFromISO(entry.Timestamp),
 				})
 			}
@@ -359,8 +359,8 @@ func BuildSessionContext(pathEntries []harness.SessionTreeEntry) *harness.Sessio
 		prefix := "The conversation history before this point was compacted into the following summary:\n\n<summary>\n"
 		suffix := "\n</summary>"
 		messages = append(messages, ai.Message{
-			Role:    "user",
-			Content: prefix + compaction.Summary + suffix,
+			Role:      "user",
+			Content:   prefix + compaction.Summary + suffix,
 			Timestamp: timestampFromISO(compaction.Timestamp),
 		})
 

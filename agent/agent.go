@@ -348,5 +348,3 @@ func (a *Agent) Continue(ctx context.Context) error {
 
 	return a.runContinuation(ctx)
 }
-
-

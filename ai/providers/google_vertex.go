@@ -23,10 +23,10 @@ import (
 // GoogleVertexOptions extends StreamOptions with Vertex-specific parameters.
 type GoogleVertexOptions struct {
 	ai.StreamOptions
-	ToolChoice string `json:"toolChoice,omitempty"`
+	ToolChoice string                `json:"toolChoice,omitempty"`
 	Thinking   *GoogleThinkingConfig `json:"thinking,omitempty"`
-	Project    string `json:"project,omitempty"`
-	Location   string `json:"location,omitempty"`
+	Project    string                `json:"project,omitempty"`
+	Location   string                `json:"location,omitempty"`
 }
 
 // StreamGoogleVertex streams from Google Vertex AI.
@@ -69,4 +69,3 @@ func StreamSimpleGoogleVertex(ctx context.Context, model *ai.Model, convCtx *ai.
 	baseOpts := ai.BuildBaseOptions(model, nil, apiKey)
 	return StreamGoogleVertex(ctx, model, convCtx, &baseOpts)
 }
-

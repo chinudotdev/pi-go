@@ -22,7 +22,7 @@ func New() *Bus {
 	}
 }
 
-	// Emit publishes data to all handlers registered on the given channel.
+// Emit publishes data to all handlers registered on the given channel.
 func (b *Bus) Emit(channel string, data any) {
 	b.mu.RLock()
 	handlers := b.handlers[channel]

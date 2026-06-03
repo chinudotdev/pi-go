@@ -22,27 +22,27 @@ import (
 // ProxyAssistantMessageEvent represents server-sent proxy events.
 // The server strips the partial field to reduce bandwidth; we reconstruct it client-side.
 type ProxyAssistantMessageEvent struct {
-	Type          string `json:"type"`
-	ContentIndex  int    `json:"contentIndex,omitempty"`
-	Delta         string `json:"delta,omitempty"`
-	ContentSignature *string `json:"contentSignature,omitempty"`
-	ID            string `json:"id,omitempty"`
-	ToolName      string `json:"toolName,omitempty"`
-	Reason        string `json:"reason,omitempty"`
-	ErrorMessage  string `json:"errorMessage,omitempty"`
-	Usage         *ai.Usage `json:"usage,omitempty"`
+	Type             string    `json:"type"`
+	ContentIndex     int       `json:"contentIndex,omitempty"`
+	Delta            string    `json:"delta,omitempty"`
+	ContentSignature *string   `json:"contentSignature,omitempty"`
+	ID               string    `json:"id,omitempty"`
+	ToolName         string    `json:"toolName,omitempty"`
+	Reason           string    `json:"reason,omitempty"`
+	ErrorMessage     string    `json:"errorMessage,omitempty"`
+	Usage            *ai.Usage `json:"usage,omitempty"`
 }
 
 // ProxySerializableStreamOptions contains the stream options sent to the proxy server.
 type ProxySerializableStreamOptions struct {
-	Temperature    *float64              `json:"temperature,omitempty"`
-	MaxTokens      int                   `json:"maxTokens,omitempty"`
-	Reasoning      ai.ThinkingLevel      `json:"reasoning,omitempty"`
-	ThinkingBudgets *ai.ThinkingBudgets  `json:"thinkingBudgets,omitempty"`
-	SessionID      string                `json:"sessionId,omitempty"`
-	Headers        map[string]string     `json:"headers,omitempty"`
-	Metadata       map[string]string     `json:"metadata,omitempty"`
-	MaxRetryDelayMs int                  `json:"maxRetryDelayMs,omitempty"`
+	Temperature     *float64            `json:"temperature,omitempty"`
+	MaxTokens       int                 `json:"maxTokens,omitempty"`
+	Reasoning       ai.ThinkingLevel    `json:"reasoning,omitempty"`
+	ThinkingBudgets *ai.ThinkingBudgets `json:"thinkingBudgets,omitempty"`
+	SessionID       string              `json:"sessionId,omitempty"`
+	Headers         map[string]string   `json:"headers,omitempty"`
+	Metadata        map[string]string   `json:"metadata,omitempty"`
+	MaxRetryDelayMs int                 `json:"maxRetryDelayMs,omitempty"`
 }
 
 // ProxyStreamOptions configures the proxy stream function.
@@ -282,9 +282,9 @@ func processProxyEvent(proxy *ProxyAssistantMessageEvent, partial *ai.AssistantM
 	case "toolcall_start":
 		ensureContentIndex(partial, proxy.ContentIndex)
 		partial.Content[proxy.ContentIndex] = ai.ContentBlock{
-			Type:             "toolCall",
-			ToolCallID:       proxy.ID,
-			ToolCallName:     proxy.ToolName,
+			Type:              "toolCall",
+			ToolCallID:        proxy.ID,
+			ToolCallName:      proxy.ToolName,
 			ToolCallArguments: map[string]any{},
 		}
 		return &ai.AssistantMessageEvent{

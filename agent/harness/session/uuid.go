@@ -11,9 +11,9 @@ import (
 
 // UUIDv7 state — monotonic within a process.
 var (
-	uuidMu      sync.Mutex
-	uuidLastTs  int64 = -1 << 62
-	uuidSeq     uint32
+	uuidMu     sync.Mutex
+	uuidLastTs int64 = -1 << 62
+	uuidSeq    uint32
 )
 
 // UUIDv7 generates a monotonic UUIDv7 string (RFC 9562).

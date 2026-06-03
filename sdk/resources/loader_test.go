@@ -178,9 +178,9 @@ func TestLoader_LoadSkills(t *testing.T) {
 func TestLoader_NoSkills(t *testing.T) {
 	dir := tempDir(t)
 	loader := NewLoader(LoaderOptions{
-		CWD:       dir,
-		AgentDir:  dir,
-		NoSkills:  true,
+		CWD:      dir,
+		AgentDir: dir,
+		NoSkills: true,
 	})
 
 	result, err := loader.Load()
