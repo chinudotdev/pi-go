@@ -947,6 +947,16 @@ func (h *AgentHarness) createLoopConfig(ctx context.Context, ts *turnState, canc
 		TransformContext: func(_ context.Context, msgs []agent.AgentMessage) ([]agent.AgentMessage, error) {
 			return msgs, nil
 		},
+		GetApiKey: func(provider string) (string, error) {
+			if h.getAuth != nil {
+				auth, err := h.getAuth(ts.model)
+				if err != nil {
+					return "", err
+				}
+				return auth.APIKey, nil
+			}
+			return "", nil
+		},
 		BeforeToolCall: func(tctx agent.BeforeToolCallContext) (*agent.BeforeToolCallResult, error) {
 			return nil, nil
 		},
