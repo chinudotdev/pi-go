@@ -1,39 +1,30 @@
-// Package agent provides a stateful agent loop for building AI assistants.
+// Package agent implements a generic agentic loop that repeatedly calls an LLM,
+// executes tool calls, and feeds results back until a terminal condition is met.
 //
-// The agent manages conversation state, executes tools, emits lifecycle events,
-// and supports steering/follow-up message queues for interactive agent control.
+// The core agent.Agent type is a state machine that supports:
+//   - Streaming LLM responses via a pluggable StreamFn
+//   - Tool dispatch with before/after hooks
+//   - Message queuing (steering and follow-up) for concurrent user input
+//   - Abort and resume
+//   - Event subscription for real-time monitoring
 //
-// # Quick Start
+// # Agent Loop
 //
-// Register the faux provider for testing:
+// The agent loop runs:
+//  1. Convert messages to LLM format
+//  2. Call the LLM (via StreamFn)
+//  3. Accumulate the streaming response
+//  4. Execute any tool calls
+//  5. If tool calls were executed, loop back to step 1
+//  6. If no tool calls, the turn is complete
 //
-//	providers.RegisterBuiltInApiProviders()
+// # Harness
 //
-// Create and run an agent:
+// The agent/harness sub-package adds session persistence, compaction, tree
+// navigation, and phase management on top of the core agent.
 //
-//	agent := agent.New(agent.Options{
-//	    Model: myModel,
-//	})
-//	agent.Subscribe(func(event agent.Event) { ... })
-//	agent.Prompt(ctx, "Hello!")
+// # Dependencies
 //
-// # Architecture
-//
-// The agent loop:
-//  1. Transforms AgentMessage[] → ai.Message[] via ConvertToLlm
-//  2. Calls the StreamFn to get an LLM response
-//  3. Executes any tool calls (sequential or parallel)
-//  4. Checks steering/follow-up queues
-//  5. Repeats until no more work
-//
-// # Events
-//
-// The agent emits typed events: agent_start, agent_end, turn_start, turn_end,
-// message_start, message_update, message_end, tool_execution_start,
-// tool_execution_update, tool_execution_end.
-//
-// # Tool Execution
-//
-// Tools implement the Tool interface with PrepareArguments and Execute methods.
-// Before/after hooks allow blocking, modifying results, or triggering early termination.
+// This package depends only on the ai/ package for LLM types. It does not
+// know about file tools, authentication, or user settings.
 package agent
