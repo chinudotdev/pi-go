@@ -137,7 +137,6 @@ func TestStreamProxy_TextGeneration(t *testing.T) {
 		},
 	}
 
-	ResetToolCallAccumulator()
 	stream, err := StreamProxy(model, convCtx, &ProxyStreamOptions{
 		AuthToken: "test-token",
 		ProxyURL:  server.URL,
@@ -189,7 +188,6 @@ func TestStreamProxy_ThinkingAndText(t *testing.T) {
 	model := &ai.Model{ID: "claude-4", Provider: "anthropic", API: "anthropic"}
 	convCtx := &ai.Context{Messages: []ai.Message{{Role: "user", Content: "Think and answer"}}}
 
-	ResetToolCallAccumulator()
 	stream, _ := StreamProxy(model, convCtx, &ProxyStreamOptions{
 		AuthToken: "test-token",
 		ProxyURL:  server.URL,
@@ -231,7 +229,6 @@ func TestStreamProxy_ToolCall(t *testing.T) {
 	model := &ai.Model{ID: "gpt-4", Provider: "openai", API: "openai-completions"}
 	convCtx := &ai.Context{Messages: []ai.Message{{Role: "user", Content: "Read test file"}}}
 
-	ResetToolCallAccumulator()
 	stream, _ := StreamProxy(model, convCtx, &ProxyStreamOptions{
 		AuthToken: "test-token",
 		ProxyURL:  server.URL,
@@ -257,6 +254,12 @@ func TestStreamProxy_ToolCall(t *testing.T) {
 	if tc.ToolCallName != "read_file" {
 		t.Errorf("expected read_file, got %s", tc.ToolCallName)
 	}
+	// Verify tool call arguments were properly accumulated from delta events
+	if tc.ToolCallArguments == nil {
+		t.Error("expected tool call arguments to be parsed")
+	} else if path, ok := tc.ToolCallArguments["path"]; !ok || path != "/tmp/test" {
+		t.Errorf("expected path=/tmp/test, got %v", tc.ToolCallArguments)
+	}
 }
 
 func TestStreamProxy_Error(t *testing.T) {
@@ -277,7 +280,6 @@ func TestStreamProxy_Error(t *testing.T) {
 	model := &ai.Model{ID: "gpt-4", Provider: "openai", API: "openai-completions"}
 	convCtx := &ai.Context{Messages: []ai.Message{{Role: "user", Content: "test"}}}
 
-	ResetToolCallAccumulator()
 	stream, _ := StreamProxy(model, convCtx, &ProxyStreamOptions{
 		AuthToken: "test-token",
 		ProxyURL:  server.URL,
@@ -315,7 +317,6 @@ func TestStreamProxy_HTTPError(t *testing.T) {
 	model := &ai.Model{ID: "gpt-4", Provider: "openai", API: "openai-completions"}
 	convCtx := &ai.Context{Messages: []ai.Message{{Role: "user", Content: "test"}}}
 
-	ResetToolCallAccumulator()
 	stream, _ := StreamProxy(model, convCtx, &ProxyStreamOptions{
 		AuthToken: "test-token",
 		ProxyURL:  server.URL,
@@ -351,7 +352,6 @@ func TestStreamProxy_AuthHeader(t *testing.T) {
 	model := &ai.Model{ID: "test", Provider: "test", API: "test"}
 	convCtx := &ai.Context{Messages: []ai.Message{{Role: "user", Content: "test"}}}
 
-	ResetToolCallAccumulator()
 	stream, _ := StreamProxy(model, convCtx, &ProxyStreamOptions{
 		AuthToken: "my-secret-token",
 		ProxyURL:  server.URL,
@@ -378,7 +378,6 @@ func TestStreamProxy_ContextCancellation(t *testing.T) {
 	model := &ai.Model{ID: "test", Provider: "test", API: "test"}
 	convCtx := &ai.Context{Messages: []ai.Message{{Role: "user", Content: "test"}}}
 
-	ResetToolCallAccumulator()
 	stream, _ := StreamProxy(model, convCtx, &ProxyStreamOptions{
 		AuthToken: "test-token",
 		ProxyURL:  server.URL,
@@ -417,7 +416,6 @@ func TestStreamProxy_SendsCorrectBody(t *testing.T) {
 		},
 	}
 
-	ResetToolCallAccumulator()
 	temp := 0.7
 	stream, _ := StreamProxy(model, convCtx, &ProxyStreamOptions{
 		AuthToken: "test-token",
@@ -443,18 +441,19 @@ func TestProcessProxyEvent_TextFlow(t *testing.T) {
 		Role:    "assistant",
 		Content: []ai.ContentBlock{},
 	}
+	accum := &toolCallAccumulator{partialJSON: make(map[int]string)}
 
-	e := processProxyEvent(&ProxyAssistantMessageEvent{Type: "start"}, partial)
+	e := processProxyEvent(&ProxyAssistantMessageEvent{Type: "start"}, partial, accum)
 	if e == nil || e.Type != "start" {
 		t.Fatal("expected start event")
 	}
 
-	e = processProxyEvent(&ProxyAssistantMessageEvent{Type: "text_start", ContentIndex: 0}, partial)
+	e = processProxyEvent(&ProxyAssistantMessageEvent{Type: "text_start", ContentIndex: 0}, partial, accum)
 	if e == nil || e.Type != "text_start" {
 		t.Fatal("expected text_start event")
 	}
 
-	e = processProxyEvent(&ProxyAssistantMessageEvent{Type: "text_delta", ContentIndex: 0, Delta: "hi"}, partial)
+	e = processProxyEvent(&ProxyAssistantMessageEvent{Type: "text_delta", ContentIndex: 0, Delta: "hi"}, partial, accum)
 	if e == nil || e.Type != "text_delta" {
 		t.Fatal("expected text_delta event")
 	}
@@ -463,7 +462,7 @@ func TestProcessProxyEvent_TextFlow(t *testing.T) {
 	}
 
 	sig := "sig1"
-	e = processProxyEvent(&ProxyAssistantMessageEvent{Type: "text_end", ContentIndex: 0, ContentSignature: &sig}, partial)
+	e = processProxyEvent(&ProxyAssistantMessageEvent{Type: "text_end", ContentIndex: 0, ContentSignature: &sig}, partial, accum)
 	if e == nil || e.Type != "text_end" {
 		t.Fatal("expected text_end event")
 	}
@@ -478,11 +477,12 @@ func TestProcessProxyEvent_DoneWithUsage(t *testing.T) {
 		Content: []ai.ContentBlock{},
 	}
 
+	accum := &toolCallAccumulator{partialJSON: make(map[int]string)}
 	e := processProxyEvent(&ProxyAssistantMessageEvent{
 		Type:   "done",
 		Reason: "stop",
 		Usage:  &ai.Usage{Input: 100, Output: 50},
-	}, partial)
+	}, partial, accum)
 
 	if e == nil || e.Type != "done" {
 		t.Fatal("expected done event")

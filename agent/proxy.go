@@ -81,6 +81,11 @@ func StreamProxy(model *ai.Model, convCtx *ai.Context, options *ProxyStreamOptio
 		Timestamp: time.Now().UnixMilli(),
 	}
 
+	// Per-stream accumulator for tool call JSON — avoids global mutable state.
+	accum := &toolCallAccumulator{
+		partialJSON: make(map[int]string),
+	}
+
 	go func() {
 
 		// Build request body
@@ -161,7 +166,7 @@ func StreamProxy(model *ai.Model, convCtx *ai.Context, options *ProxyStreamOptio
 				continue // Skip malformed events
 			}
 
-			event := processProxyEvent(&proxyEvent, partial)
+			event := processProxyEvent(&proxyEvent, partial, accum)
 			if event != nil {
 				// If this is a terminal event, end the stream
 				if event.Type == "done" {
@@ -196,7 +201,7 @@ func StreamProxy(model *ai.Model, convCtx *ai.Context, options *ProxyStreamOptio
 // Event processing
 // ============================================================================
 
-func processProxyEvent(proxy *ProxyAssistantMessageEvent, partial *ai.AssistantMessage) *ai.AssistantMessageEvent {
+func processProxyEvent(proxy *ProxyAssistantMessageEvent, partial *ai.AssistantMessage, accum *toolCallAccumulator) *ai.AssistantMessageEvent {
 	switch proxy.Type {
 	case "start":
 		return &ai.AssistantMessageEvent{
@@ -291,14 +296,11 @@ func processProxyEvent(proxy *ProxyAssistantMessageEvent, partial *ai.AssistantM
 	case "toolcall_delta":
 		if proxy.ContentIndex < len(partial.Content) && partial.Content[proxy.ContentIndex].Type == "toolCall" {
 			// Accumulate partial JSON and parse incrementally
-			existing := partial.Content[proxy.ContentIndex].ToolCallArguments
-			if existing == nil {
-				existing = map[string]any{}
+			accum.partialJSON[proxy.ContentIndex] += proxy.Delta
+			parsed, _ := ai.ParseStreamingJSON(accum.partialJSON[proxy.ContentIndex])
+			if parsed != nil {
+				partial.Content[proxy.ContentIndex].ToolCallArguments = parsed
 			}
-			// We need to track partialJson externally since ContentBlock doesn't have it
-			// Instead, we use ParseStreamingJSON on the accumulated string
-			// For simplicity, we accumulate the arguments via the streaming JSON parser
-			_ = proxy.Delta
 			return &ai.AssistantMessageEvent{
 				Type:         "toolcall_delta",
 				ContentIndex: proxyIntPtr(proxy.ContentIndex),
@@ -394,45 +396,15 @@ func pushProxyAbort(stream *ai.EventStream, partial *ai.AssistantMessage) {
 
 func proxyIntPtr(v int) *int { return &v }
 
-// Now let me also handle the toolcall_delta properly with partial JSON tracking.
-// We need a way to accumulate partial JSON for tool calls.
-// Since ContentBlock doesn't have a partialJson field, we track it externally.
-
+// toolCallAccumulator tracks partial JSON per content index for streaming tool calls.
+// It is scoped to each StreamProxy call — no global mutable state.
 type toolCallAccumulator struct {
 	partialJSON map[int]string // contentIndex -> accumulated JSON
 }
 
-var toolCallAccum = &toolCallAccumulator{
-	partialJSON: make(map[int]string),
-}
-
-func init() {
-	// Override processProxyEvent's toolcall_delta handling to use accumulator
-}
-
-// processToolCallDelta handles the streaming JSON accumulation for tool call arguments.
-func processToolCallDelta(proxy *ProxyAssistantMessageEvent, partial *ai.AssistantMessage) *ai.AssistantMessageEvent {
-	if proxy.ContentIndex >= len(partial.Content) || partial.Content[proxy.ContentIndex].Type != "toolCall" {
-		return nil
-	}
-
-	toolCallAccum.partialJSON[proxy.ContentIndex] += proxy.Delta
-	parsed, _ := ai.ParseStreamingJSON(toolCallAccum.partialJSON[proxy.ContentIndex])
-	if parsed != nil {
-		partial.Content[proxy.ContentIndex].ToolCallArguments = parsed
-	}
-
-	return &ai.AssistantMessageEvent{
-		Type:         "toolcall_delta",
-		ContentIndex: proxyIntPtr(proxy.ContentIndex),
-		Delta:        &proxy.Delta,
-		Partial:      partial,
-	}
-}
-
-// ResetToolCallAccumulator clears the partial JSON state. Call between streams.
-func ResetToolCallAccumulator() {
-	toolCallAccum.partialJSON = make(map[int]string)
+// Reset clears the accumulator state. Call between stream reuse if needed.
+func (a *toolCallAccumulator) Reset() {
+	a.partialJSON = make(map[int]string)
 }
 
 // ReadBody is a helper to read an io.ReadCloser for testing.
