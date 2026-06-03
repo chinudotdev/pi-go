@@ -326,4 +326,4 @@ ai.RegisterApiProvider(ai.ApiProvider{
 
 ## License
 
-Private — © chinudotdev
+[MIT](LICENSE) © chinudotdev
