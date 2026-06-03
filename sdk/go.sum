@@ -1,3 +1,7 @@
+github.com/chinudotdev/pi-go/agent v0.1.0 h1:zRGHKPiFyn1vGvAAWJ6gagYejDwsi5jnLWXKrwgUNU8=
+github.com/chinudotdev/pi-go/agent v0.1.0/go.mod h1:riHAf3CuD8J5Yu+vtbENuZMFihPookJfaNfjQc4NiLw=
+github.com/chinudotdev/pi-go/ai v0.1.0 h1:V4xTX8ALtjbwQ7F3jD51W7Tn+WCzFoKHXC+NRfx2Cms=
+github.com/chinudotdev/pi-go/ai v0.1.0/go.mod h1:iMilXVBl0CDiDL1zmIgSio1qqmh4yrijCEWWjB4J3p8=
 github.com/goccy/go-yaml v1.19.2 h1:PmFC1S6h8ljIz6gMRBopkjP1TVT7xuwrButHID66PoM=
 github.com/goccy/go-yaml v1.19.2/go.mod h1:XBurs7gK8ATbW4ZPGKgcbrY1Br56PdM69F7LkFRi1kA=
 github.com/openai/openai-go v1.12.0 h1:NBQCnXzqOTv5wsgNC36PrFEiskGfO5wccfCWDo9S1U0=
