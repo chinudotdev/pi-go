@@ -8,7 +8,6 @@ Go SDK for building AI-powered agents — provider-agnostic, streaming-first, wi
 |----------|--------|
 | Understand the design | [`ARCHITECTURE.md`](ARCHITECTURE.md) |
 | See how packages fit together | [`ARCHITECTURE.md`](ARCHITECTURE.md) — package map |
-| Get started with code | [`DEVELOPER_GUIDE.md`](DEVELOPER_GUIDE.md) |
 | Browse runnable examples | [`examples/`](examples/) |
 | Read about core AI types & providers | [`ai/README.md`](ai/README.md) |
 | Read about the agent loop & tools | [`agent/README.md`](agent/README.md) |

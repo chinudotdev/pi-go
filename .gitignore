@@ -36,7 +36,6 @@ Thumbs.db
 # Environment / secrets
 .env
 .env.*
-!.env.example
 
 # Session / log files
 *.jsonl
